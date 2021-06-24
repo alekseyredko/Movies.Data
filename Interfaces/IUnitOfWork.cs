@@ -15,7 +15,7 @@ namespace MoviesDataLayer.Interfaces
         IGenericRepository<Person> Persons { get; }
         IGenericRepository<Review> Reviews { get; }
         IGenericRepository<Reviewer> Reviewers { get; }
-        IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory { get; }
+        //IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory { get; }
         Task<int> SaveAsync();
     }
 }
