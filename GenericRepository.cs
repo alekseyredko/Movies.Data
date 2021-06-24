@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace MoviesDataLayer
 {
-    class GenericREpository<TEntity> : IGenericRepository<TEntity> where TEntity : class
+    class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
         internal MoviesDBContext context;
         internal DbSet<TEntity> dbSet;
 
-        public GenericREpository(MoviesDBContext context)
+        public GenericRepository(MoviesDBContext context)
         {
             this.context = context;
             this.dbSet = context.Set<TEntity>();
