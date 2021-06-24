@@ -203,7 +203,7 @@ namespace MoviesDataLayer
                     .HasConstraintName("FK__ReviewerW__Movie__44FF419A");
 
                 entity.HasOne(d => d.Reviewer)
-                    .WithMany()
+                    .WithMany(p => p.ReviewerWatchHistories)
                     .HasForeignKey(d => d.ReviewerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__ReviewerW__Revie__45F365D3");
