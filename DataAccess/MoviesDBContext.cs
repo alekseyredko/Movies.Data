@@ -84,10 +84,12 @@ namespace Movies.Data.DataAccess
                     .HasConstraintName("FK_Movie_Producer");
 
                 entity.HasMany(d => d.Actors)
-                    .WithMany(d => d.Movies);
+                    .WithMany(d => d.Movies)
+                    .UsingEntity(t => t.ToTable("MoviesActors"));
 
                 entity.HasMany(d => d.Genres)
-                    .WithMany(d => d.Movies);
+                    .WithMany(d => d.Movies)
+                    .UsingEntity(t => t.ToTable("MovieGenres"));
             });
 
             modelBuilder.Entity<Person>(entity =>
