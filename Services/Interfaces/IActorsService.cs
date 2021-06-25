@@ -1,8 +1,5 @@
-﻿using MoviesDataLayer.Models;
-using System;
+﻿using Movies.Data.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Movies.Data.Services.Interfaces

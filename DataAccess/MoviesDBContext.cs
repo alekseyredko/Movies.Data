@@ -25,7 +25,7 @@ namespace Movies.Data.DataAccess
         public virtual DbSet<Producer> Producers { get; set; }
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Reviewer> Reviewers { get; set; }
-        public virtual DbSet<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
+        //public virtual DbSet<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -94,14 +94,15 @@ namespace Movies.Data.DataAccess
                 entity.HasMany(d => d.Reviewers)
                     .WithMany(p => p.Movies)
                     .UsingEntity<ReviewerWatchHistory>
-                    (
-                        j => j.HasOne(m => m.Movie)
-                              .WithMany(mov => mov.ReviewerWatchHistories)
-                              .HasForeignKey(f => f.MovieId),
+                    (                        
 
                         j => j.HasOne(r => r.Reviewer)
                               .WithMany(w => w.ReviewerWatchHistories)
                               .HasForeignKey(r => r.ReviewerId),
+
+                        j => j.HasOne(m => m.Movie)
+                              .WithMany(mov => mov.ReviewerWatchHistories)
+                              .HasForeignKey(f => f.MovieId),
 
                         j => j.HasKey(k => new { k.MovieId, k.ReviewerId })
                     );
