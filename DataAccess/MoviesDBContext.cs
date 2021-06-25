@@ -20,9 +20,7 @@ namespace Movies.Data.DataAccess
 
         public virtual DbSet<Actor> Actors { get; set; }
         public virtual DbSet<Genre> Genres { get; set; }
-        public virtual DbSet<Movie> Movies { get; set; }
-        public virtual DbSet<MovieGenre> MovieGenres { get; set; }
-        public virtual DbSet<MoviesActor> MoviesActors { get; set; }
+        public virtual DbSet<Movie> Movies { get; set; }        
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Producer> Producers { get; set; }
         public virtual DbSet<Review> Reviews { get; set; }
@@ -84,42 +82,6 @@ namespace Movies.Data.DataAccess
                     .HasForeignKey(d => d.ProducerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Movie_Producer");
-            });
-
-            modelBuilder.Entity<MovieGenre>(entity =>
-            {
-                entity.HasKey(e => new { e.GenreId, e.MovieId })
-                    .HasName("PK__MovieGen__B7382C3F24545B4F");
-
-                entity.HasOne(d => d.Genre)
-                    .WithMany(p => p.MovieGenres)
-                    .HasForeignKey(d => d.GenreId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__MovieGenr__Genre__3E52440B");
-
-                entity.HasOne(d => d.Movie)
-                    .WithMany(p => p.MovieGenres)
-                    .HasForeignKey(d => d.MovieId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__MovieGenr__Movie__3F466844");
-            });
-
-            modelBuilder.Entity<MoviesActor>(entity =>
-            {
-                entity.HasKey(e => new { e.ActorId, e.MovieId })
-                    .HasName("PK__MoviesAc__E30EC30A44E7D562");
-
-                entity.HasOne(d => d.Actor)
-                    .WithMany(p => p.MoviesActors)
-                    .HasForeignKey(d => d.ActorId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__MoviesAct__Actor__4222D4EF");
-
-                entity.HasOne(d => d.Movie)
-                    .WithMany(p => p.MoviesActors)
-                    .HasForeignKey(d => d.MovieId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__MoviesAct__Movie__4316F928");
             });
 
             modelBuilder.Entity<Person>(entity =>

@@ -1,5 +1,6 @@
-﻿using MoviesDataLayer.Interfaces;
-using MoviesDataLayer.Models;
+﻿using Movies.Data.DataAccess;
+using Movies.Data.Models;
+using MoviesDataLayer.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

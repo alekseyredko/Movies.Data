@@ -9,12 +9,12 @@ namespace Movies.Data.Models
     {
         public Genre()
         {
-            MovieGenres = new HashSet<MovieGenre>();
+            MovieGenres = new HashSet<Movie>();
         }
 
         public int GenreId { get; set; }
         public string GenreName { get; set; }
 
-        public virtual ICollection<MovieGenre> MovieGenres { get; set; }
+        public virtual ICollection<Movie> MovieGenres { get; set; }
     }
 }
