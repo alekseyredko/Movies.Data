@@ -105,5 +105,10 @@ namespace MoviesDataLayer
             var items = await dbSet.ToListAsync();
             return items;
         }
+
+        public void Dispose()
+        {
+            context.Dispose();
+        }
     }
 }

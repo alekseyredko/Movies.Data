@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MoviesDataLayer.Interfaces
 {
-    public interface IGenericRepository<TEntity> where TEntity: class
+    public interface IGenericRepository<TEntity>: IDisposable where TEntity: class
     {
         void Delete(TEntity entityToDelete);
         void Delete(object id);
