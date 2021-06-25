@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace MoviesDataLayer.Models
+namespace Movies.Data.Models
 {
     public partial class Genre
     {

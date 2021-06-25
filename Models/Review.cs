@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace MoviesDataLayer.Models
+namespace Movies.Data.Models
 {
     public partial class Review
     {
@@ -12,7 +12,7 @@ namespace MoviesDataLayer.Models
         public double? Rate { get; set; }
         public int MovieId { get; set; }
         public int ReviewerId { get; set; }
-        public DateTime? LastUpdate { get; set; }
+        public DateTime LastUpdate { get; set; }
 
         public virtual Movie Movie { get; set; }
         public virtual Reviewer Reviewer { get; set; }

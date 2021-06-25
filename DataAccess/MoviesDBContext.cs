@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using MoviesDataLayer.Models;
+using Movies.Data.Models;
 
 #nullable disable
 
-namespace MoviesDataLayer
+namespace Movies.Data.DataAccess
 {
     public partial class MoviesDBContext : DbContext
     {
@@ -24,7 +24,7 @@ namespace MoviesDataLayer
         public virtual DbSet<MovieGenre> MovieGenres { get; set; }
         public virtual DbSet<MoviesActor> MoviesActors { get; set; }
         public virtual DbSet<Person> People { get; set; }
-        public virtual DbSet<ProducerMovie> ProducerMovies { get; set; }
+        public virtual DbSet<Producer> Producers { get; set; }
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Reviewer> Reviewers { get; set; }
         public virtual DbSet<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
@@ -78,6 +78,12 @@ namespace MoviesDataLayer
                     .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Producer)
+                    .WithMany(p => p.Movies)
+                    .HasForeignKey(d => d.ProducerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Movie_Producer");
             });
 
             modelBuilder.Entity<MovieGenre>(entity =>
@@ -123,35 +129,34 @@ namespace MoviesDataLayer
                 entity.HasIndex(e => e.PersonName, "UQ__Person__B88311BE6306F845")
                     .IsUnique();
 
+                entity.Property(e => e.PersonId).ValueGeneratedNever();
+
                 entity.Property(e => e.PersonName)
                     .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<ProducerMovie>(entity =>
+            modelBuilder.Entity<Producer>(entity =>
             {
-                entity.HasKey(e => new { e.ProducerId, e.MovieId })
-                    .HasName("PK__Producer__A78BBF1302A41092");
+                entity.ToTable("Producer");
 
-                entity.HasOne(d => d.Movie)
-                    .WithMany(p => p.ProducerMovies)
-                    .HasForeignKey(d => d.MovieId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProducerM__Movie__31EC6D26");
+                entity.Property(e => e.ProducerId).ValueGeneratedNever();
 
-                entity.HasOne(d => d.Producer)
-                    .WithMany(p => p.ProducerMovies)
-                    .HasForeignKey(d => d.ProducerId)
+                entity.HasOne(d => d.ProducerNavigation)
+                    .WithOne(p => p.Producer)
+                    .HasForeignKey<Producer>(d => d.ProducerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProducerM__Produ__30F848ED");
+                    .HasConstraintName("FK_Producer_Person");
             });
 
             modelBuilder.Entity<Review>(entity =>
             {
                 entity.ToTable("Review");
 
-                entity.Property(e => e.LastUpdate).HasColumnType("datetime");
+                entity.Property(e => e.LastUpdate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getutcdate())");
 
                 entity.Property(e => e.Rate).HasDefaultValueSql("((5))");
 
@@ -203,7 +208,7 @@ namespace MoviesDataLayer
                     .HasConstraintName("FK__ReviewerW__Movie__44FF419A");
 
                 entity.HasOne(d => d.Reviewer)
-                    .WithMany(p => p.ReviewerWatchHistories)
+                    .WithMany()
                     .HasForeignKey(d => d.ReviewerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__ReviewerW__Revie__45F365D3");

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace MoviesDataLayer.Models
+namespace Movies.Data.Models
 {
     public partial class Movie
     {
@@ -11,7 +11,6 @@ namespace MoviesDataLayer.Models
         {
             MovieGenres = new HashSet<MovieGenre>();
             MoviesActors = new HashSet<MoviesActor>();
-            ProducerMovies = new HashSet<ProducerMovie>();
             Reviews = new HashSet<Review>();
         }
 
@@ -20,10 +19,11 @@ namespace MoviesDataLayer.Models
         public TimeSpan Duration { get; set; }
         public double? Rate { get; set; }
         public DateTime? LastUpdate { get; set; }
+        public int ProducerId { get; set; }
 
+        public virtual Producer Producer { get; set; }
         public virtual ICollection<MovieGenre> MovieGenres { get; set; }
         public virtual ICollection<MoviesActor> MoviesActors { get; set; }
-        public virtual ICollection<ProducerMovie> ProducerMovies { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
     }
 }
