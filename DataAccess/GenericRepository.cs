@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MoviesDataLayer
 {
-    class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
         internal MoviesDBContext context;
         internal DbSet<TEntity> dbSet;
@@ -53,13 +53,14 @@ namespace MoviesDataLayer
         }
 
         public virtual TEntity GetByID(object id)
-        {
+        {            
             return dbSet.Find(id);
+            
         }
 
         public virtual void Insert(TEntity entity)
         {
-            dbSet.Add(entity);
+            dbSet.Add(entity);             
         }
 
         public virtual void Delete(object id)
@@ -72,15 +73,31 @@ namespace MoviesDataLayer
         {
             if (context.Entry(entityToDelete).State == EntityState.Detached)
             {
-                dbSet.Attach(entityToDelete);
+                dbSet.Attach(entityToDelete);                
             }
-            dbSet.Remove(entityToDelete);
+            dbSet.Remove(entityToDelete);           
         }
 
         public virtual void Update(TEntity entityToUpdate)
         {
-            dbSet.Attach(entityToUpdate);
+            dbSet.Attach(entityToUpdate);            
             context.Entry(entityToUpdate).State = EntityState.Modified;
+        }
+
+        public async Task DeleteAsync(object id)
+        {
+            var entityToDelete = await dbSet.FindAsync(id);
+            Delete(entityToDelete);
+        }
+
+        public Task<TEntity> GetByIDAsync(object id)
+        {
+            return dbSet.FindAsync(id).AsTask();
+        }
+
+        public Task InsertAsync(TEntity entity)
+        {
+            return dbSet.AddAsync(entity).AsTask();
         }
     }
 }
