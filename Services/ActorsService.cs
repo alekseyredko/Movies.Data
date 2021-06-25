@@ -1,12 +1,7 @@
-﻿using AutoMapper;
+﻿using Movies.Data.Models;
 using Movies.Data.Services.Interfaces;
-using MoviesDataLayer;
 using MoviesDataLayer.Interfaces;
-using MoviesDataLayer.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Movies.Data.Services
