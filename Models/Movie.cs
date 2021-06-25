@@ -25,5 +25,7 @@ namespace Movies.Data.Models
         public virtual ICollection<Genre> Genres { get; set; }
         public virtual ICollection<Actor> Actors { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
+        public virtual ICollection<Reviewer> Reviewers { get; set; }
+        public List<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
     }
 }

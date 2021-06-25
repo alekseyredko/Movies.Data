@@ -17,5 +17,7 @@ namespace Movies.Data.Models
         public int PersonId { get; set; }
         public virtual Person Person { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
+        public ICollection<Movie> Movies { get; set; }
+        public List<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
     }
 }

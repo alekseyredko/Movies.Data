@@ -90,6 +90,21 @@ namespace Movies.Data.DataAccess
                 entity.HasMany(d => d.Genres)
                     .WithMany(d => d.Movies)
                     .UsingEntity(t => t.ToTable("MovieGenres"));
+
+                entity.HasMany(d => d.Reviewers)
+                    .WithMany(p => p.Movies)
+                    .UsingEntity<ReviewerWatchHistory>
+                    (
+                        j => j.HasOne(m => m.Movie)
+                              .WithMany(mov => mov.ReviewerWatchHistories)
+                              .HasForeignKey(f => f.MovieId),
+
+                        j => j.HasOne(r => r.Reviewer)
+                              .WithMany(w => w.ReviewerWatchHistories)
+                              .HasForeignKey(r => r.ReviewerId),
+
+                        j => j.HasKey(k => new { k.MovieId, k.ReviewerId })
+                    );
             });
 
             modelBuilder.Entity<Person>(entity =>
