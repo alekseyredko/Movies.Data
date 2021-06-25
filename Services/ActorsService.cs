@@ -36,5 +36,11 @@ namespace Movies.Data.Services
         {
             return _unitOfWork.Actors.GetByIDAsync(id);
         }
+
+        public async Task<IEnumerable<Actor>> GetActorsAsync()
+        {
+            var actors = await _unitOfWork.Actors.GetAllAsync();
+            return actors;
+        }
     }
 }

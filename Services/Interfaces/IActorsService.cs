@@ -11,6 +11,7 @@ namespace Movies.Data.Services.Interfaces
     {
         Task AddActorAsync(Actor actor);
         Task<Actor> GetActorAsync(int id);
+        Task<IEnumerable<Actor>> GetActorsAsync();
         Task DeleteActorAsync(int id);
     }
 }

@@ -29,6 +29,12 @@ namespace Movies.Data.Services
             await _unitOfWork.Persons.DeleteAsync(id);
         }
 
+        public async Task<IEnumerable<Person>> GetAllPersonAsync()
+        {
+            var people = await _unitOfWork.Persons.GetAllAsync();
+            return people;
+        }
+
         public Task<Person> GetPersonAsync(int id)
         {
             return _unitOfWork.Persons.GetByIDAsync(id);

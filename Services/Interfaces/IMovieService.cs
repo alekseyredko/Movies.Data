@@ -10,7 +10,8 @@ namespace Movies.Data.Services.Interfaces
     public interface IMovieService
     {
         Task AddMovieAsync(Movie movie);
-        Task<Actor> GetMovieAsync(int id);
+        Task<Movie> GetMovieAsync(int id);
+        Task<IEnumerable<Movie>> GetAllMoviesAsync();
         Task DeleteMovieAsync(int id);
     }
 }

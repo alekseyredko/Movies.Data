@@ -30,9 +30,15 @@ namespace Movies.Data.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public Task<Actor> GetMovieAsync(int id)
+        public async Task<IEnumerable<Movie>> GetAllMoviesAsync()
         {
-            return _unitOfWork.Actors.GetByIDAsync(id);
+            var movies = await _unitOfWork.Movies.GetAllAsync();
+            return movies;
+        }
+
+        public Task<Movie> GetMovieAsync(int id)
+        {
+            return _unitOfWork.Movies.GetByIDAsync(id);
         }
     }
 }
