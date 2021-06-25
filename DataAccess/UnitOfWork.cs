@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MoviesDataLayer
 {
-    class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private MoviesDBContext _moviesDBContext;
 

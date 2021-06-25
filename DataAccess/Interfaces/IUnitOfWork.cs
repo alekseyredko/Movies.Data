@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MoviesDataLayer.Interfaces
 {
-    interface IUnitOfWork: IDisposable
+    public interface IUnitOfWork: IDisposable
     {
         IGenericRepository<Actor> Actors { get; }
         IGenericRepository<Genre> Genres { get; }
