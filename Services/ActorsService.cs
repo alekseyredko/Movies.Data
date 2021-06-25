@@ -20,14 +20,16 @@ namespace Movies.Data.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task AddActorAsync(Actor actor)
+        public async Task AddActorAsync(Actor actor)
         {
-            return _unitOfWork.Actors.InsertAsync(actor);
+            await _unitOfWork.Actors.InsertAsync(actor);
+            await _unitOfWork.SaveAsync();
         }
 
-        public Task DeleteActorAsync(int id)
+        public async Task DeleteActorAsync(int id)
         {
-            return _unitOfWork.Actors.DeleteAsync(id);
+            await _unitOfWork.Actors.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
         }
 
         public Task<Actor> GetActorAsync(int id)
