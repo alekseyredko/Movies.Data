@@ -175,30 +175,7 @@ namespace Movies.Data.DataAccess
                     .HasForeignKey<Reviewer>(d => d.ReviewerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Reviewer__Review__34C8D9D1");
-            });
-
-            modelBuilder.Entity<ReviewerWatchHistory>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToTable("ReviewerWatchHistory");
-
-                entity.Property(e => e.LastWatchTime).HasColumnType("datetime");
-
-                entity.Property(e => e.ReviewerId).HasColumnName("ReviewerID");
-
-                entity.HasOne(d => d.Movie)
-                    .WithMany()
-                    .HasForeignKey(d => d.MovieId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ReviewerW__Movie__44FF419A");
-
-                entity.HasOne(d => d.Reviewer)
-                    .WithMany()
-                    .HasForeignKey(d => d.ReviewerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ReviewerW__Revie__45F365D3");
-            });
+            });           
 
             OnModelCreatingPartial(modelBuilder);
         }
