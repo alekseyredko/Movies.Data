@@ -12,39 +12,49 @@ namespace MoviesDataLayer
     {
         private MoviesDBContext _moviesDBContext;
 
-        private IGenericRepository<Actor> _actorRepository;
-        private IGenericRepository<Genre> _genreRepository;
-        private IGenericRepository<Movie> _movieRepository;
-        private IGenericRepository<Person> _personRepository;
-        private IGenericRepository<Review> _reviewRepository;
-        private IGenericRepository<Reviewer> _reviewerRepository;
-        private IGenericRepository<ReviewerWatchHistory> _reviewerWatchHistoryRepository;
+        private readonly IGenericRepository<Actor> _actorRepository;
+        private readonly IGenericRepository<Genre> _genreRepository;
+        private readonly IGenericRepository<Movie> _movieRepository;
+        private readonly IGenericRepository<Person> _personRepository;
+        private readonly IGenericRepository<Review> _reviewRepository;
+        private readonly IGenericRepository<Reviewer> _reviewerRepository;
+        private readonly IGenericRepository<ReviewerWatchHistory> _reviewerWatchHistoryRepository;
 
-        public UnitOfWork(MoviesDBContext moviesDBContext)
+        public IGenericRepository<Actor> Actors => _actorRepository;
+
+        public IGenericRepository<Genre> Genres => _genreRepository;
+
+        public IGenericRepository<Movie> Movies => _movieRepository;
+
+        public IGenericRepository<Person> Persons => _personRepository;
+
+        public IGenericRepository<Review> Reviews => _reviewRepository;
+
+        public IGenericRepository<Reviewer> Reviewers => _reviewerRepository;
+
+        public IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory => _reviewerWatchHistoryRepository;
+
+        //public UnitOfWork(MoviesDBContext moviesDBContext)
+        //{
+        //    _moviesDBContext = moviesDBContext;
+        //}
+
+        public UnitOfWork(IGenericRepository<Actor> actorRepository, 
+            IGenericRepository<Genre> genreRepository, 
+            IGenericRepository<Movie> movieRepository, 
+            IGenericRepository<Person> personRepository, 
+            IGenericRepository<Review> reviewRepository, 
+            IGenericRepository<Reviewer> reviewerRepository, 
+            IGenericRepository<ReviewerWatchHistory> reviewerWatchHistoryRepository)
         {
-            _moviesDBContext = moviesDBContext;
+            _actorRepository = actorRepository;
+            _genreRepository = genreRepository;
+            _movieRepository = movieRepository;
+            _personRepository = personRepository;
+            _reviewRepository = reviewRepository;
+            _reviewerRepository = reviewerRepository;
+            _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;
         }
-
-        public IGenericRepository<Actor> Actors => 
-            _actorRepository ??= new GenericRepository<Actor>(_moviesDBContext);
-
-        public IGenericRepository<Genre> Genres => 
-            _genreRepository ??= new GenericRepository<Genre>(_moviesDBContext);
-
-        public IGenericRepository<Movie> Movies => 
-            _movieRepository ??= new GenericRepository<Movie>(_moviesDBContext);
-
-        public IGenericRepository<Person> Persons => 
-            _personRepository ??= new GenericRepository<Person>(_moviesDBContext);
-
-        public IGenericRepository<Review> Reviews => 
-            _reviewRepository ??= new GenericRepository<Review>(_moviesDBContext);
-
-        public IGenericRepository<Reviewer> Reviewers => 
-            _reviewerRepository ??= new GenericRepository<Reviewer>(_moviesDBContext);
-
-        public IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory => 
-            _reviewerWatchHistoryRepository ??= new GenericRepository<ReviewerWatchHistory>(_moviesDBContext);
 
         public void Dispose()
         {
