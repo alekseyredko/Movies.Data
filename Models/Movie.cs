@@ -9,8 +9,8 @@ namespace Movies.Data.Models
     {
         public Movie()
         {
-            MovieGenres = new HashSet<Genre>();
-            MoviesActors = new HashSet<Actor>();
+            Genres = new HashSet<Genre>();
+            Actors = new HashSet<Actor>();
             Reviews = new HashSet<Review>();
         }
 
@@ -22,8 +22,8 @@ namespace Movies.Data.Models
         public int ProducerId { get; set; }
 
         public virtual Producer Producer { get; set; }
-        public virtual ICollection<Genre> MovieGenres { get; set; }
-        public virtual ICollection<Actor> MoviesActors { get; set; }
+        public virtual ICollection<Genre> Genres { get; set; }
+        public virtual ICollection<Actor> Actors { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
     }
 }

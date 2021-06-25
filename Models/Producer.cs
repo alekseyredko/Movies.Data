@@ -13,8 +13,8 @@ namespace Movies.Data.Models
         }
 
         public int ProducerId { get; set; }
-
-        public virtual Person ProducerNavigation { get; set; }
+        public int PersonId { get; set; }
+        public virtual Person Person { get; set; }
         public virtual ICollection<Movie> Movies { get; set; }
     }
 }

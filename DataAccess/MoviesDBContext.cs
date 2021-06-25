@@ -46,7 +46,7 @@ namespace Movies.Data.DataAccess
 
                 entity.Property(e => e.ActorId).ValueGeneratedNever();
 
-                entity.HasOne(d => d.ActorNavigation)
+                entity.HasOne(d => d.Person)
                     .WithOne(p => p.Actor)
                     .HasForeignKey<Actor>(d => d.ActorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -82,6 +82,12 @@ namespace Movies.Data.DataAccess
                     .HasForeignKey(d => d.ProducerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Movie_Producer");
+
+                entity.HasMany(d => d.Actors)
+                    .WithMany(d => d.Movies);
+
+                entity.HasMany(d => d.Genres)
+                    .WithMany(d => d.Movies);
             });
 
             modelBuilder.Entity<Person>(entity =>
@@ -105,7 +111,7 @@ namespace Movies.Data.DataAccess
 
                 entity.Property(e => e.ProducerId).ValueGeneratedNever();
 
-                entity.HasOne(d => d.ProducerNavigation)
+                entity.HasOne(d => d.Person)
                     .WithOne(p => p.Producer)
                     .HasForeignKey<Producer>(d => d.ProducerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -146,7 +152,7 @@ namespace Movies.Data.DataAccess
 
                 entity.Property(e => e.ReviewerId).ValueGeneratedNever();
 
-                entity.HasOne(d => d.ReviewerNavigation)
+                entity.HasOne(d => d.Person)
                     .WithOne(p => p.Reviewer)
                     .HasForeignKey<Reviewer>(d => d.ReviewerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)

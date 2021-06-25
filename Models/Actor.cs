@@ -9,13 +9,14 @@ namespace Movies.Data.Models
     {
         public Actor()
         {
-            MoviesActors = new HashSet<Movie>();
+            Movies = new HashSet<Movie>();
         }
 
         public int ActorId { get; set; }
         public int? Age { get; set; }
 
-        public virtual Person ActorNavigation { get; set; }
-        public virtual ICollection<Movie> MoviesActors { get; set; }
+        public int PersonId { get; set; }
+        public virtual Person Person { get; set; }
+        public virtual ICollection<Movie> Movies { get; set; }
     }
 }
