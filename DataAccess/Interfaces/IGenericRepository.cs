@@ -18,6 +18,7 @@ namespace MoviesDataLayer.Interfaces
             string includeProperties = "");
         TEntity GetByID(object id);
         Task<TEntity> GetByIDAsync(object id);
+        Task<IEnumerable<TEntity>> GetAllAsync();
         void Insert(TEntity entity);
         Task InsertAsync(TEntity entity);
         void Update(TEntity entityToUpdate);

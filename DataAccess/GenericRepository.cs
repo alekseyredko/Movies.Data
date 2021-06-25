@@ -99,5 +99,11 @@ namespace MoviesDataLayer
         {
             return dbSet.AddAsync(entity).AsTask();
         }
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        {
+            var items = await dbSet.ToListAsync();
+            return items;
+        }
     }
 }
