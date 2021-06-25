@@ -17,9 +17,23 @@ namespace Movies.Data.Mapper
                 .ForMember(destination => destination.MoviesActors,
                 options => options.MapFrom(src => src.MoviesActors.Select(actors => actors.Actor)));
 
-            //CreateMap<ActorDto, Actor>()
-            //    .ForMember(destination => destination.
-            //    options => options.MapFrom(src => src.MoviesActors));
+            CreateMap<ActorDto, Actor>()
+                .ForMember(destination => destination.MoviesActors,
+                            options => options.MapFrom(src => src.MoviesActors))
+                .AfterMap((source, destination) =>
+                {
+                    foreach (var item in destination.MoviesActors)
+                    {
+                        item.ActorId = destination.ActorId;                        
+                    }
+                });
+
+            CreateMap<Actor, MoviesActor>()
+                .ForMember(destination => destination.ActorId,
+                    options => options.MapFrom(src => src.ActorId))
+                .ForMember(destination => destination.Actor,
+                    options => options.MapFrom(src => src));
+
 
 
             //CreateMap<ADTO, A>()
