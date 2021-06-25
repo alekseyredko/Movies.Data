@@ -1,4 +1,5 @@
-﻿using MoviesDataLayer.Interfaces;
+﻿using Movies.Data.Services.Interfaces;
+using MoviesDataLayer.Interfaces;
 using MoviesDataLayer.Models;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Movies.Data.Services.Interfaces
+namespace Movies.Data.Services
 {
     public class MovieService : IMovieService
     {
