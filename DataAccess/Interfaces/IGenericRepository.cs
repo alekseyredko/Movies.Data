@@ -21,6 +21,6 @@ namespace MoviesDataLayer.Interfaces
         Task<IEnumerable<TEntity>> GetAllAsync();
         void Insert(TEntity entity);
         Task InsertAsync(TEntity entity);
-        void Update(TEntity entityToUpdate);
+        void Update(TEntity entityToUpdate);        
     }
 }

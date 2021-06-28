@@ -1,4 +1,5 @@
-﻿using Movies.Data.Models;
+﻿using Movies.Data.DataAccess.Interfaces;
+using Movies.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace MoviesDataLayer.Interfaces
 {
     public interface IUnitOfWork: IDisposable
     {
-        IGenericRepository<Actor> Actors { get; }
+        IActorRepository Actors { get; }
         IGenericRepository<Genre> Genres { get; }
-        IGenericRepository<Movie> Movies { get; }
-        IGenericRepository<Person> Persons { get; }
+        IMovieRepository Movies { get; }
+        IPersonRepository Persons { get; }
         IGenericRepository<Review> Reviews { get; }
         IGenericRepository<Reviewer> Reviewers { get; }
         IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory { get; }

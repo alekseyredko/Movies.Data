@@ -1,4 +1,5 @@
 ﻿using Movies.Data.DataAccess;
+using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
 using MoviesDataLayer.Interfaces;
 using System;
@@ -9,25 +10,30 @@ using System.Threading.Tasks;
 
 namespace MoviesDataLayer
 {
+
+    //TODO: implment CQRS
+    //TODO: get rid of Unit of work
+    //inject repos directly in Services
+    //implement specific repository interfaces
     public class UnitOfWork : IUnitOfWork
     {
         private MoviesDBContext _moviesDBContext;
 
-        private readonly IGenericRepository<Actor> _actorRepository;
+        private readonly IActorRepository _actorRepository;
         private readonly IGenericRepository<Genre> _genreRepository;
-        private readonly IGenericRepository<Movie> _movieRepository;
-        private readonly IGenericRepository<Person> _personRepository;
+        private readonly IMovieRepository _movieRepository;
+        private readonly IPersonRepository _personRepository;
         private readonly IGenericRepository<Review> _reviewRepository;
         private readonly IGenericRepository<Reviewer> _reviewerRepository;
         private readonly IGenericRepository<ReviewerWatchHistory> _reviewerWatchHistoryRepository;
 
-        public IGenericRepository<Actor> Actors => _actorRepository;
+        public IActorRepository Actors => _actorRepository;
 
         public IGenericRepository<Genre> Genres => _genreRepository;
 
-        public IGenericRepository<Movie> Movies => _movieRepository;
+        public IMovieRepository Movies => _movieRepository;
 
-        public IGenericRepository<Person> Persons => _personRepository;
+        public IPersonRepository Persons => _personRepository;
 
         public IGenericRepository<Review> Reviews => _reviewRepository;
 
@@ -40,10 +46,10 @@ namespace MoviesDataLayer
         //    _moviesDBContext = moviesDBContext;
         //}
 
-        public UnitOfWork(IGenericRepository<Actor> actorRepository, 
-            IGenericRepository<Genre> genreRepository, 
-            IGenericRepository<Movie> movieRepository, 
-            IGenericRepository<Person> personRepository, 
+        public UnitOfWork(IActorRepository actorRepository, 
+            IGenericRepository<Genre> genreRepository,
+            IMovieRepository movieRepository, 
+            IPersonRepository personRepository, 
             IGenericRepository<Review> reviewRepository, 
             IGenericRepository<Reviewer> reviewerRepository, 
             IGenericRepository<ReviewerWatchHistory> reviewerWatchHistoryRepository)
@@ -54,7 +60,7 @@ namespace MoviesDataLayer
             _personRepository = personRepository;
             _reviewRepository = reviewRepository;
             _reviewerRepository = reviewerRepository;
-            _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;
+            _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;            
         }
 
         public void Dispose()

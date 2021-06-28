@@ -12,6 +12,7 @@ namespace MoviesDataLayer
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
+        //TODO: implement DbServiceLocator
         internal MoviesDBContext context;
         internal DbSet<TEntity> dbSet;
 
@@ -80,7 +81,7 @@ namespace MoviesDataLayer
         }
 
         public virtual void Update(TEntity entityToUpdate)
-        {
+        {            
             dbSet.Attach(entityToUpdate);            
             context.Entry(entityToUpdate).State = EntityState.Modified;
         }

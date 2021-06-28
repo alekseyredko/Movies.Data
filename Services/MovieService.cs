@@ -16,13 +16,13 @@ namespace Movies.Data.Services
         public MovieService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-        }
+        }        
 
         public async Task AddMovieAsync(Movie movie)
         {
             await _unitOfWork.Movies.InsertAsync(movie);
             await _unitOfWork.SaveAsync();
-        }
+        }        
 
         public async Task DeleteMovieAsync(int id)
         {
@@ -36,9 +36,58 @@ namespace Movies.Data.Services
             return movies;
         }
 
+        public async Task DeleteActorAsync(int movieId, int actorId)
+        {
+            var movie = await _unitOfWork.Movies.GetMovieWithActorsAsync(movieId);
+            var actor = movie.Actors.FirstOrDefault(x => x.ActorId == actorId);
+
+            if (actor == null)
+            {
+                throw new InvalidOperationException($"Actor not found in movie with id: {movieId}");
+            }
+
+            movie.Actors.Remove(actor);
+            _unitOfWork.Movies.Update(movie);
+
+            await _unitOfWork.SaveAsync();
+        }
+
+        public async Task AddActorAsync(int movieId, int actorId)
+        {
+            var movie = await _unitOfWork.Movies.GetMovieWithActorsAsync(movieId);
+            var actor = await _unitOfWork.Actors.GetByIDAsync(actorId);
+
+            if (actor == null)
+            {
+                throw new InvalidOperationException($"Actor not found in movie with id: {movieId}");
+            }
+
+            movie.Actors.Add(actor);
+            _unitOfWork.Movies.Update(movie);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public Task<IEnumerable<Movie>> GetAllMoviesWithInfoAsync()
+        {
+            return _unitOfWork.Movies.GetMoviesWithAllAsync();
+        }
+
+        public async Task<IEnumerable<Actor>> GetMovieActorsAsync(int movieId)
+        {
+            var movie = await _unitOfWork.Movies.GetMovieWithActorsAsync(movieId);
+
+            return movie.Actors;
+        }
+
         public Task<Movie> GetMovieAsync(int id)
         {
             return _unitOfWork.Movies.GetByIDAsync(id);
+        }       
+
+        public async Task UpdateMovieAsync(Movie movie)
+        {
+            _unitOfWork.Movies.Update(movie);
+            await _unitOfWork.SaveAsync();
         }
     }
 }

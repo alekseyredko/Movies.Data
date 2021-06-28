@@ -18,6 +18,11 @@ namespace Movies.Data.Services
             _unitOfWork = unitOfWork;
         }
 
+        public Task AddActorAsync(Actor actor)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task AddPersonAsync(Person person)
         {
             await _unitOfWork.Persons.InsertAsync(person);
@@ -38,6 +43,16 @@ namespace Movies.Data.Services
         public Task<Person> GetPersonAsync(int id)
         {
             return _unitOfWork.Persons.GetByIDAsync(id);
+        }
+
+        public Task<IEnumerable<Person>> GetAllPersonWithActorsAsync()
+        {
+            return _unitOfWork.Persons.GetAllPersonWithActorsAsync();
+        }
+
+        public Task<Person> GetPersonWithActorAsync(int id)
+        {
+            return _unitOfWork.Persons.GetPersonWithActorAsync(id);
         }
     }
 }
