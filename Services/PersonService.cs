@@ -1,10 +1,8 @@
-﻿using Movies.Data.Services.Interfaces;
+﻿using Movies.Data.Models;
+using Movies.Data.Services.Interfaces;
 using MoviesDataLayer.Interfaces;
-using Movies.Data.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Movies.Data.Services
@@ -20,7 +18,7 @@ namespace Movies.Data.Services
 
         public Task AddActorAsync(Actor actor)
         {
-            throw new NotImplementedException();
+            return _unitOfWork.Actors.InsertAsync(actor);
         }
 
         public async Task AddPersonAsync(Person person)
