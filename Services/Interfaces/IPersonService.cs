@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Movies.Data.Services.Interfaces
 {
-    interface IPersonService
+    public interface IPersonService
     {
         Task AddPersonAsync(Person person);
         Task<Person> GetPersonAsync(int id);
