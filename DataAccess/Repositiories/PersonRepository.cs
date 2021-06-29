@@ -41,8 +41,9 @@ namespace Movies.Data.DataAccess.Repositiories
 
         public async Task<Person> GetPersonWithActorAsync(int id)
         {
-            var actor = await context.Actors.SingleAsync(x => x.ActorId == id);
-            var person = await context.People.SingleAsync(x => x.PersonId == actor.PersonId);
+            var person = await context.People.SingleAsync(x => x.PersonId == id);
+            await context.Entry(person).Reference(x => x.Actor).LoadAsync();
+            
             return person;
         }
     }

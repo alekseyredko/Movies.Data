@@ -23,8 +23,8 @@ namespace MoviesDataLayer
         private readonly IGenericRepository<Genre> _genreRepository;
         private readonly IMovieRepository _movieRepository;
         private readonly IPersonRepository _personRepository;
-        private readonly IGenericRepository<Review> _reviewRepository;
-        private readonly IGenericRepository<Reviewer> _reviewerRepository;
+        private readonly IReviewRepository _reviewRepository;
+        private readonly IReviewerRepository _reviewerRepository;
         private readonly IGenericRepository<ReviewerWatchHistory> _reviewerWatchHistoryRepository;
 
         public IActorRepository Actors => _actorRepository;
@@ -35,9 +35,9 @@ namespace MoviesDataLayer
 
         public IPersonRepository Persons => _personRepository;
 
-        public IGenericRepository<Review> Reviews => _reviewRepository;
+        public IReviewRepository Reviews => _reviewRepository;
 
-        public IGenericRepository<Reviewer> Reviewers => _reviewerRepository;
+        public IReviewerRepository Reviewers => _reviewerRepository;
 
         public IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory => _reviewerWatchHistoryRepository;
 
@@ -46,13 +46,14 @@ namespace MoviesDataLayer
         //    _moviesDBContext = moviesDBContext;
         //}
 
-        public UnitOfWork(IActorRepository actorRepository, 
+        public UnitOfWork(IActorRepository actorRepository,
             IGenericRepository<Genre> genreRepository,
-            IMovieRepository movieRepository, 
-            IPersonRepository personRepository, 
-            IGenericRepository<Review> reviewRepository, 
-            IGenericRepository<Reviewer> reviewerRepository, 
-            IGenericRepository<ReviewerWatchHistory> reviewerWatchHistoryRepository)
+            IMovieRepository movieRepository,
+            IPersonRepository personRepository,
+            IReviewRepository reviewRepository,
+            IReviewerRepository reviewerRepository,
+            IGenericRepository<ReviewerWatchHistory> reviewerWatchHistoryRepository, 
+            MoviesDBContext moviesDBContext)
         {
             _actorRepository = actorRepository;
             _genreRepository = genreRepository;
@@ -60,7 +61,8 @@ namespace MoviesDataLayer
             _personRepository = personRepository;
             _reviewRepository = reviewRepository;
             _reviewerRepository = reviewerRepository;
-            _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;            
+            _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;
+            _moviesDBContext = moviesDBContext;
         }
 
         public void Dispose()

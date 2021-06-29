@@ -14,8 +14,8 @@ namespace MoviesDataLayer.Interfaces
         IGenericRepository<Genre> Genres { get; }
         IMovieRepository Movies { get; }
         IPersonRepository Persons { get; }
-        IGenericRepository<Review> Reviews { get; }
-        IGenericRepository<Reviewer> Reviewers { get; }
+        IReviewRepository Reviews { get; }
+        IReviewerRepository Reviewers { get; }
         IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory { get; }
         Task<int> SaveAsync();
     }

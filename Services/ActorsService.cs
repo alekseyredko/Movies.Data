@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 namespace Movies.Data.Services
 {
     public class ActorsService : IActorsService
-    {
-        private readonly IActorRepository actorRepository;
+    {       
         private readonly IUnitOfWork _unitOfWork;
 
         public ActorsService(IUnitOfWork unitOfWork)

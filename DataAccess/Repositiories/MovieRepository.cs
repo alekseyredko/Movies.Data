@@ -44,5 +44,33 @@ namespace Movies.Data.DataAccess.Repositiories
 
             return movie;
         }
+
+        public async Task<Movie> GetMovieWithAllAsync(int movieId)
+        {
+            var movie = await context.Movies.FirstAsync(x => x.MovieId == movieId);
+            foreach (var item in context.Entry(movie).Collections)
+            {
+                await item.LoadAsync();
+            }
+            await context.Entry(movie).Reference(x => x.Producer).LoadAsync();
+
+            return movie;
+        }
+
+        public async Task<Movie> GetMovieWithReviewsAsync(int movieId)
+        {
+            var movie = await context.Movies.FirstAsync(x => x.MovieId == movieId);
+            await context.Entry(movie).Collection(x => x.Reviews).LoadAsync();
+
+            return movie;
+        }
+
+        public async Task<Movie> GetMovieWithReviewersAsync(int movieId)
+        {
+            var movie = await context.Movies.FirstAsync(x => x.MovieId == movieId);
+            await context.Entry(movie).Collection(x => x.Reviewers).LoadAsync();
+
+            return movie;
+        }
     }
 }

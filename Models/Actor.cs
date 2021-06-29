@@ -16,7 +16,7 @@ namespace Movies.Data.Models
         public int? Age { get; set; }
 
         public int PersonId { get; set; }
-        public Person Person { get; set; }
+        public virtual Person Person { get; set; }
         public virtual ICollection<Movie> Movies { get; set; }
     }
 }

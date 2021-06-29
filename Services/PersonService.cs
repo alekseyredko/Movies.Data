@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Movies.Data.Services
 {
-    class PersonService : IPersonService
+    public class PersonService : IPersonService
     {
-        private IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public PersonService(IUnitOfWork unitOfWork)
         {

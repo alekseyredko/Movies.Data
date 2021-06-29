@@ -76,7 +76,7 @@ namespace MoviesDataLayer
             if (context.Entry(entityToDelete).State == EntityState.Detached)
             {
                 dbSet.Attach(entityToDelete);                
-            }
+            }            
             dbSet.Remove(entityToDelete);           
         }
 
@@ -111,6 +111,11 @@ namespace MoviesDataLayer
         public void Dispose()
         {
             context.Dispose();
+        }
+
+        public async Task SaveAsync()
+        {
+            await context.SaveChangesAsync();
         }
     }
 }

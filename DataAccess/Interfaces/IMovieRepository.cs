@@ -13,6 +13,9 @@ namespace Movies.Data.DataAccess.Interfaces
     {
         Task<IEnumerable<Movie>> GetMoviesWithAllAsync();
         Task<IEnumerable<Movie>> GetMoviesWithActorsAsync();        
-        Task<Movie> GetMovieWithActorsAsync(int movieId);       
+        Task<Movie> GetMovieWithActorsAsync(int movieId);
+        Task<Movie> GetMovieWithAllAsync(int movieId);
+        Task<Movie> GetMovieWithReviewsAsync(int movieId);
+        Task<Movie> GetMovieWithReviewersAsync(int movieId);
     }
 }
