@@ -59,7 +59,7 @@ namespace Movies.Data.Services
 
             if (actor == null)
             {
-                throw new InvalidOperationException($"Actor not found in movie with id: {movieId}");
+                throw new InvalidOperationException($"Actor not found in movie with id: {actorId}");
             }
 
             movie.Actors.Add(actor);

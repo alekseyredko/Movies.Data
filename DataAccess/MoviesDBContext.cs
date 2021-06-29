@@ -50,6 +50,11 @@ namespace Movies.Data.DataAccess
                     .HasForeignKey<Actor>(d => d.ActorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Actor__ActorId__2D27B809");
+
+                entity.HasMany(d => d.Movies)
+                    .WithMany(d => d.Actors)
+                    .UsingEntity(t => t.ToTable("MoviesActors"));
+               
             });
 
             modelBuilder.Entity<Genre>(entity =>
@@ -63,6 +68,10 @@ namespace Movies.Data.DataAccess
                     .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
+
+                entity.HasMany(d => d.Movies)
+                   .WithMany(d => d.Genres)
+                   .UsingEntity(t => t.ToTable("MovieGenres"));
             });
 
             modelBuilder.Entity<Movie>(entity =>

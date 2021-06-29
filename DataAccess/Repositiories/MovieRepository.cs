@@ -39,7 +39,7 @@ namespace Movies.Data.DataAccess.Repositiories
 
         public async Task<Movie> GetMovieWithActorsAsync(int movieId)
         {
-            var movie = await context.Movies.FirstAsync(x => x.MovieId == movieId);
+            var movie = await context.Movies.FindAsync(movieId);
             await context.Entry(movie).Collection(x => x.Actors).LoadAsync();
 
             return movie;
