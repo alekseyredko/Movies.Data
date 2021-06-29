@@ -36,11 +36,15 @@ namespace Movies.Data.Services
             return movies;
         }
 
-        public async Task DeleteActorAsync(int movieId, int actorId)
+        public async Task DeleteActorFromMovieAsync(int movieId, int actorId)
         {
             var movie = await _unitOfWork.Movies.GetMovieWithActorsAsync(movieId);
-            var actor = movie.Actors.FirstOrDefault(x => x.ActorId == actorId);
+            if (movie == null)
+            {
+                throw new InvalidOperationException($"Movie not found in database with id: {movieId}");
+            }
 
+            var actor = movie.Actors.FirstOrDefault(x => x.ActorId == actorId);            
             if (actor == null)
             {
                 throw new InvalidOperationException($"Actor not found in movie with id: {movieId}");
@@ -52,11 +56,15 @@ namespace Movies.Data.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task AddActorAsync(int movieId, int actorId)
+        public async Task AddActorToMovieAsync(int movieId, int actorId)
         {
             var movie = await _unitOfWork.Movies.GetMovieWithActorsAsync(movieId);
-            var actor = await _unitOfWork.Actors.GetByIDAsync(actorId);
-
+            if (movie == null)
+            {
+                throw new InvalidOperationException($"Movie not found in database with id: {movieId}");
+            }
+            
+            var actor = await _unitOfWork.Actors.GetByIDAsync(actorId);          
             if (actor == null)
             {
                 throw new InvalidOperationException($"Actor not found in movie with id: {actorId}");
@@ -83,6 +91,11 @@ namespace Movies.Data.Services
         {
             return _unitOfWork.Movies.GetByIDAsync(id);
         }       
+
+        public Task<Movie> GetMovieWithReviewsAsync(int id)
+        {
+            return _unitOfWork.Movies.GetMovieWithReviewsAsync(id);
+        }
 
         public async Task UpdateMovieAsync(Movie movie)
         {

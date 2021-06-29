@@ -27,7 +27,12 @@ namespace Movies.Data.Services
             }
 
             var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(movieId);
-            
+
+            if (movie == null)
+            {
+                throw new InvalidOperationException($"Movie not found in database with id: {movieId}");
+            }
+
             movie.Reviews.Add(review);
 
             RecalculateTotalMovieScore(movie);
@@ -45,12 +50,12 @@ namespace Movies.Data.Services
         public async Task DeleteReviewAsync(int id)
         {
             var review = await _unitOfWork.Reviews.GetReviewWithMovie(id);
-            var movie = review.Movie;
-
             if (review == null)
             {
                 throw new InvalidOperationException($"No such review with id: {id}");
             }
+
+            var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(review.MovieId);
 
             await _unitOfWork.Reviews.DeleteAsync(id);
             movie.Rate = movie.Reviews
@@ -64,6 +69,11 @@ namespace Movies.Data.Services
         public async Task DeleteReviewerAsync(int id)
         {
             var reviewer = await _unitOfWork.Reviewers.GetReviewerWithAllAsync(id);
+            if (reviewer == null)
+            {
+                throw new InvalidOperationException($"Reviewer not found in database with id: {id}");
+            }
+
             await _unitOfWork.Reviewers.DeleteAsync(id);
 
             //TODO: recalculate total movie score

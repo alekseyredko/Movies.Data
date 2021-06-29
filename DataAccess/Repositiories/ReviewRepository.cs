@@ -37,6 +37,11 @@ namespace Movies.Data.DataAccess.Repositiories
         public async Task<Review> GetReviewWithMovie(int reviewId)
         {
             var review = await context.Reviews.FindAsync(reviewId);
+            if(review == null)
+            {
+                throw new InvalidOperationException($"Review not found in database with id {reviewId}");
+            }    
+
             await context.Entry(review).Reference(x => x.Movie).LoadAsync();
 
             return review;
