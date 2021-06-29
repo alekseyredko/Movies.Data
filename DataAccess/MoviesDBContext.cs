@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Logging;
 using Movies.Data.Models;
 
 #nullable disable
@@ -29,11 +30,12 @@ namespace Movies.Data.DataAccess
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
+
+            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Trace);
             optionsBuilder
                 .UseLazyLoadingProxies()
-                .UseSqlServer("Data Source=MSQL-03467;Initial Catalog=MoviesDB;Integrated Security=True");
-        }
+                .UseSqlServer("Data Source=MSQL-03467;Initial Catalog=MoviesDB;Integrated Security=True")            
+        }       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,8 +94,9 @@ namespace Movies.Data.DataAccess
                     .HasConstraintName("FK_Movie_Producer");
 
                 entity.HasMany(d => d.Actors)
-                    .WithMany(d => d.Movies)
+                    .WithMany(d => d.Movies)                    
                     .UsingEntity(t => t.ToTable("MoviesActors"));
+
 
                 entity.HasMany(d => d.Genres)
                     .WithMany(d => d.Movies)
@@ -115,6 +118,9 @@ namespace Movies.Data.DataAccess
                         j => j.HasKey(k => new { k.MovieId, k.ReviewerId })
                     );
             });
+
+
+            //modelBuilder.Entity("MovieActors")                
 
             modelBuilder.Entity<Person>(entity =>
             {
