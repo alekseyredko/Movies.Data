@@ -9,8 +9,8 @@ namespace Movies.Data.Models
     {
         public Movie()
         {
-            Genres = new HashSet<Genre>();
-            Actors = new HashSet<Actor>();
+            MovieGenres = new HashSet<MovieGenre>();
+            MoviesActors = new HashSet<MoviesActor>();
             Reviews = new HashSet<Review>();
         }
 
@@ -23,9 +23,11 @@ namespace Movies.Data.Models
 
         public virtual Producer Producer { get; set; }
         public virtual ICollection<Genre> Genres { get; set; }
-        public virtual ICollection<Actor> Actors { get; set; }
-        public virtual ICollection<Review> Reviews { get; set; }
+        public virtual ICollection<Actor> Actors { get; set; } 
         public virtual ICollection<Reviewer> Reviewers { get; set; }
-        public virtual List<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
+        public virtual ICollection<MovieGenre> MovieGenres { get; set; }
+        public virtual ICollection<MoviesActor> MoviesActors { get; set; }
+        public virtual ICollection<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
+        public virtual ICollection<Review> Reviews { get; set; }
     }
 }

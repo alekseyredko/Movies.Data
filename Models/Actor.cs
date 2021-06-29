@@ -9,7 +9,7 @@ namespace Movies.Data.Models
     {
         public Actor()
         {
-            Movies = new HashSet<Movie>();
+            MoviesActors = new HashSet<MoviesActor>();
         }
 
         public int ActorId { get; set; }
@@ -18,5 +18,6 @@ namespace Movies.Data.Models
         public int PersonId { get; set; }
         public virtual Person Person { get; set; }
         public virtual ICollection<Movie> Movies { get; set; }
+        public virtual ICollection<MoviesActor> MoviesActors { get; set; }
     }
 }
