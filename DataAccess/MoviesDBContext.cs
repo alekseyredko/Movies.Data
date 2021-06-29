@@ -34,7 +34,7 @@ namespace Movies.Data.DataAccess
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Trace);
             optionsBuilder
                 .UseLazyLoadingProxies()
-                .UseSqlServer("Data Source=MSQL-03467;Initial Catalog=MoviesDB;Integrated Security=True")            
+                .UseSqlServer("Data Source=MSQL-03467;Initial Catalog=MoviesDB;Integrated Security=True");            
         }       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
