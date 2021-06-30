@@ -138,6 +138,7 @@ namespace Movies.Data.DataAccess
                               .WithMany(mov => mov.ReviewerWatchHistories)
                               .HasForeignKey(f => f.MovieId),
                         j => j.HasKey(k => new { k.MovieId, k.ReviewerId })
+                                .HasName("PK_ReviewerWatchHistory")
                     );
             });
 
