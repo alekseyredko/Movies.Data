@@ -12,6 +12,10 @@ namespace Movies.Data.Models
             MovieGenres = new HashSet<MovieGenre>();
             MoviesActors = new HashSet<MoviesActor>();
             Reviews = new HashSet<Review>();
+            Genres = new HashSet<Genre>();
+            Actors = new HashSet<Actor>();
+            Reviewers = new HashSet<Reviewer>();
+            ReviewerWatchHistories = new HashSet<ReviewerWatchHistory>();
         }
 
         public int MovieId { get; set; }
@@ -19,7 +23,7 @@ namespace Movies.Data.Models
         public TimeSpan Duration { get; set; }
         public double? Rate { get; set; }
         public DateTime? LastUpdate { get; set; }
-        public int ProducerId { get; set; }
+        public int? ProducerId { get; set; }
 
         public virtual Producer Producer { get; set; }
         public virtual ICollection<Genre> Genres { get; set; }

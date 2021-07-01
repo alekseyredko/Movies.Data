@@ -92,9 +92,10 @@ namespace MoviesDataLayer
             Delete(entityToDelete);
         }
 
-        public Task<TEntity> GetByIDAsync(object id)
-        {
-            return dbSet.FindAsync(id).AsTask();
+        public async Task<TEntity> GetByIDAsync(object id)
+        {            
+            var entity = await dbSet.FindAsync(id);
+            return entity;
         }
 
         public Task InsertAsync(TEntity entity)
