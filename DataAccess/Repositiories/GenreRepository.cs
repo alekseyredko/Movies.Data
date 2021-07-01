@@ -4,7 +4,7 @@ using MoviesDataLayer;
 
 namespace Movies.Data.DataAccess.Repositiories
 {
-    class GenreRepository : GenericRepository<Genre>, IGenreRepository
+    public class GenreRepository : GenericRepository<Genre>, IGenreRepository
     {
         public GenreRepository(MoviesDBContext context) : base(context)
         {
