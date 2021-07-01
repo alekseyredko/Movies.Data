@@ -198,13 +198,13 @@ namespace Movies.Data.DataAccess
                 entity.HasOne(d => d.Movie)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.MovieId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Review__MovieId__3A81B327");
 
                 entity.HasOne(d => d.Reviewer)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.ReviewerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Review__Reviewer__3B75D760");
             });
 

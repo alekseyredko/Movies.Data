@@ -108,5 +108,10 @@ namespace Movies.Data.Services
         {
             return _unitOfWork.Reviewers.GetByIDAsync(id);
         }
+
+        public Task<IEnumerable<Reviewer>> GetAllReviewersAsync()
+        {
+            return _unitOfWork.Reviewers.GetAllAsync();
+        }
     }
 }

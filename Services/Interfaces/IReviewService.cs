@@ -15,5 +15,6 @@ namespace Movies.Data.Services.Interfaces
         Task AddReviewAsync(Review review, int movieId);
         Task DeleteReviewAsync(int id);
         Task<Review> GetReviewAsync(int id);
+        Task<IEnumerable<Reviewer>> GetAllReviewersAsync();
     }
 }
