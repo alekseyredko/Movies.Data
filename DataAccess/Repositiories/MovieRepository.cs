@@ -66,6 +66,12 @@ namespace Movies.Data.DataAccess.Repositiories
         public async Task<Movie> GetMovieWithReviewsAsync(int movieId)
         {
             var movie = await context.Movies.FirstAsync(x => x.MovieId == movieId);
+
+            if (movie == null)
+            {
+                return null;
+            }
+
             await context.Entry(movie).Collection(x => x.Reviews).LoadAsync();
 
             return movie;

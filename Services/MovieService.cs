@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 
 namespace Movies.Data.Services
 {
@@ -20,8 +21,16 @@ namespace Movies.Data.Services
 
         public async Task AddMovieAsync(Movie movie)
         {
-            await _unitOfWork.Movies.InsertAsync(movie);
-            await _unitOfWork.SaveAsync();
+            try
+            {
+                await _unitOfWork.Movies.InsertAsync(movie);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }        
 
         public async Task DeleteMovieAsync(int id)
@@ -84,23 +93,46 @@ namespace Movies.Data.Services
         {
             var movie = await _unitOfWork.Movies.GetMovieWithActorsAsync(movieId);
 
+            if (movie == null)
+            {
+                throw new InvalidOperationException($"Movie not found in database with id: {movieId}");
+            }
+
             return movie.Actors;
         }
 
-        public Task<Movie> GetMovieAsync(int id)
+        public async Task<Movie> GetMovieAsync(int id)
         {
-            return _unitOfWork.Movies.GetByIDAsync(id);
+            var movie = await _unitOfWork.Movies.GetByIDAsync(id);
+            if (movie == null)
+            {
+                throw new InvalidOperationException($"Movie not found in database with id: {id}");
+            }
+
+            return movie;
         }       
 
-        public Task<Movie> GetMovieWithReviewsAsync(int id)
+        public async Task<Movie> GetMovieWithReviewsAsync(int id)
         {
-            return _unitOfWork.Movies.GetMovieWithReviewsAsync(id);
+            var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(id);
+            if (movie == null)
+            {
+                throw new InvalidOperationException($"Movie not found in database with id: {id}");
+            }
+
+            return movie;
         }
 
         public async Task UpdateMovieAsync(Movie movie)
         {
             _unitOfWork.Movies.Update(movie);
             await _unitOfWork.SaveAsync();
+        }
+
+        public async Task UpdateMovieAsync(int id, Movie movie)
+        {
+            var getMovie = await GetMovieAsync(id);
+            await UpdateMovieAsync(movie);
         }
     }
 }
