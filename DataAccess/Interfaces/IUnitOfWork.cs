@@ -11,12 +11,12 @@ namespace MoviesDataLayer.Interfaces
     public interface IUnitOfWork: IDisposable
     {
         IActorRepository Actors { get; }
-        IGenericRepository<Genre> Genres { get; }
+        IGenreRepository Genres { get; }
         IMovieRepository Movies { get; }
         IPersonRepository Persons { get; }
         IReviewRepository Reviews { get; }
         IReviewerRepository Reviewers { get; }
-        IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory { get; }
+       IReviewerWatchHistoryRepository ReviewersWatchHistory { get; }
         Task<int> SaveAsync();
     }
 }

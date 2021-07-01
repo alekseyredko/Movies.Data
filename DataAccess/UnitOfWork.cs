@@ -20,16 +20,16 @@ namespace MoviesDataLayer
         private MoviesDBContext _moviesDBContext;
 
         private readonly IActorRepository _actorRepository;
-        private readonly IGenericRepository<Genre> _genreRepository;
+        private readonly IGenreRepository _genreRepository;
         private readonly IMovieRepository _movieRepository;
         private readonly IPersonRepository _personRepository;
         private readonly IReviewRepository _reviewRepository;
         private readonly IReviewerRepository _reviewerRepository;
-        private readonly IGenericRepository<ReviewerWatchHistory> _reviewerWatchHistoryRepository;
+        private readonly IReviewerWatchHistoryRepository _reviewerWatchHistoryRepository;
 
         public IActorRepository Actors => _actorRepository;
 
-        public IGenericRepository<Genre> Genres => _genreRepository;
+        public IGenreRepository Genres => _genreRepository;
 
         public IMovieRepository Movies => _movieRepository;
 
@@ -39,7 +39,7 @@ namespace MoviesDataLayer
 
         public IReviewerRepository Reviewers => _reviewerRepository;
 
-        public IGenericRepository<ReviewerWatchHistory> ReviewersWatchHistory => _reviewerWatchHistoryRepository;
+        public IReviewerWatchHistoryRepository ReviewersWatchHistory => _reviewerWatchHistoryRepository;
 
         //public UnitOfWork(MoviesDBContext moviesDBContext)
         //{
@@ -47,12 +47,12 @@ namespace MoviesDataLayer
         //}
 
         public UnitOfWork(IActorRepository actorRepository,
-            IGenericRepository<Genre> genreRepository,
+            IGenreRepository genreRepository,
             IMovieRepository movieRepository,
             IPersonRepository personRepository,
             IReviewRepository reviewRepository,
             IReviewerRepository reviewerRepository,
-            IGenericRepository<ReviewerWatchHistory> reviewerWatchHistoryRepository, 
+            IReviewerWatchHistoryRepository reviewerWatchHistoryRepository, 
             MoviesDBContext moviesDBContext)
         {
             _actorRepository = actorRepository;
