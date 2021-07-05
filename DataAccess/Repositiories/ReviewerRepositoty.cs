@@ -31,6 +31,12 @@ namespace Movies.Data.DataAccess.Repositiories
         public async Task<Reviewer> GetReviewerWithAllAsync(int reviewerId)
         {
             var reviewer = await context.Reviewers.FindAsync(reviewerId);
+
+            if (reviewer == null)
+            {
+                throw new InvalidOperationException($"Reviewer not found in database with id: {reviewerId}");
+            }
+
             await context.Entry(reviewer).Collection(x => x.Movies).LoadAsync();
             await context.Entry(reviewer).Collection(x => x.Reviews).LoadAsync();
 

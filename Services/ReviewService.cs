@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Movies.Data.Services
@@ -43,8 +44,15 @@ namespace Movies.Data.Services
 
         public async Task AddReviewerAsync(Reviewer reviewer)
         {
-            await _unitOfWork.Reviewers.InsertAsync(reviewer);
-            await _unitOfWork.SaveAsync();
+            try
+            {
+                await _unitOfWork.Reviewers.InsertAsync(reviewer);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                throw new InvalidOperationException($"Reviewer already exists in database with id: {reviewer.ReviewerId}");
+            }
         }
 
         public async Task DeleteReviewAsync(int id)
@@ -99,19 +107,48 @@ namespace Movies.Data.Services
                         
         }
 
-        public Task<Review> GetReviewAsync(int id)
+        public async Task<Review> GetReviewAsync(int id)
         {
-            return _unitOfWork.Reviews.GetByIDAsync(id);
+            var review = await _unitOfWork.Reviews.GetByIDAsync(id);
+            if (review == null)
+            {
+                throw new InvalidOperationException($"Review not found in database with id: {id}");
+            }
+
+            return review;
         }
 
-        public Task<Reviewer> GetReviewerAsync(int id)
+        public async Task<Reviewer> GetReviewerAsync(int id)
         {
-            return _unitOfWork.Reviewers.GetByIDAsync(id);
+            var reviewer = await _unitOfWork.Reviewers.GetByIDAsync(id);
+            if (reviewer == null)
+            {
+                throw new InvalidOperationException($"Reviewer not found in database with id: {id}");
+            }
+
+            return reviewer;
+        }
+
+        public async Task<Reviewer> GetReviewerWithAllAsync(int id)
+        {
+            var reviewer = await _unitOfWork.Reviewers.GetReviewerWithAllAsync(id);
+            if (reviewer == null)
+            {
+                throw new InvalidOperationException($"Reviewer not found in database with id: {id}");
+            }
+
+            return reviewer;
         }
 
         public Task<IEnumerable<Reviewer>> GetAllReviewersAsync()
         {
             return _unitOfWork.Reviewers.GetAllAsync();
+        }
+
+        public async Task UpdateReviewerAsync(Reviewer reviewer)
+        {
+            _unitOfWork.Reviewers.Update(reviewer);
+            await _unitOfWork.SaveAsync();
         }
     }
 }

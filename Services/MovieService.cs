@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace Movies.Data.Services
 {
@@ -26,17 +27,24 @@ namespace Movies.Data.Services
                 await _unitOfWork.Movies.InsertAsync(movie);
                 await _unitOfWork.SaveAsync();
             }
-            catch (SqlException e)
+            catch (DbUpdateException e)
             {
-                Console.WriteLine(e);
-                throw;
+                throw new InvalidOperationException($"Movie already exists in database with id: {movie.MovieId}");
             }
         }        
 
         public async Task DeleteMovieAsync(int id)
         {
-            await _unitOfWork.Movies.DeleteAsync(id);
-            await _unitOfWork.SaveAsync();
+            try
+            {
+                await _unitOfWork.Movies.DeleteAsync(id);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine(e);
+                throw new InvalidOperationException($"Movie not found in database with id: {id}");
+            }
         }
 
         public async Task<IEnumerable<Movie>> GetAllMoviesAsync()
@@ -127,12 +135,6 @@ namespace Movies.Data.Services
         {
             _unitOfWork.Movies.Update(movie);
             await _unitOfWork.SaveAsync();
-        }
-
-        public async Task UpdateMovieAsync(int id, Movie movie)
-        {
-            var getMovie = await GetMovieAsync(id);
-            await UpdateMovieAsync(movie);
         }
     }
 }

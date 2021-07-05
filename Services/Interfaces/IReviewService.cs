@@ -12,9 +12,11 @@ namespace Movies.Data.Services.Interfaces
         Task AddReviewerAsync(Reviewer reviewer);
         Task DeleteReviewerAsync(int id);
         Task<Reviewer> GetReviewerAsync(int id);
+        Task<Reviewer> GetReviewerWithAllAsync(int id);
         Task AddReviewAsync(Review review, int movieId);
         Task DeleteReviewAsync(int id);
         Task<Review> GetReviewAsync(int id);
         Task<IEnumerable<Reviewer>> GetAllReviewersAsync();
+        Task UpdateReviewerAsync(Reviewer reviewer);
     }
 }
