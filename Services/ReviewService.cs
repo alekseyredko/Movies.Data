@@ -145,9 +145,20 @@ namespace Movies.Data.Services
             return _unitOfWork.Reviewers.GetAllAsync();
         }
 
+        public Task<IEnumerable<Review>> GetAllReviewsAsync()
+        {
+            return _unitOfWork.Reviews.GetAllAsync();
+        }
+
         public async Task UpdateReviewerAsync(Reviewer reviewer)
         {
             _unitOfWork.Reviewers.Update(reviewer);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public async Task UpdateReviewService(Review review)
+        {
+            _unitOfWork.Reviews.Update(review);
             await _unitOfWork.SaveAsync();
         }
     }
