@@ -66,9 +66,9 @@ namespace Movies.Data.Services
             var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(review.MovieId);
 
             await _unitOfWork.Reviews.DeleteAsync(id);
-            movie.Rate = movie.Reviews
-                .Where(x => x.ReviewId != id)
-                .Sum(x => x.Rate);
+            movie.Reviews.Remove(review);
+
+            RecalculateTotalMovieScore(movie);
 
             _unitOfWork.Movies.Update(movie);           
             await _unitOfWork.SaveAsync();
@@ -89,12 +89,14 @@ namespace Movies.Data.Services
             //TODO: Recalculate all total movie score
             //TODO: Define cascade delete in db
 
+            
+
             foreach (var reviewerMovie in reviewer.Movies)
             {
                 var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(reviewerMovie.MovieId);
-                movie.Rate = movie.Reviews
-                    .Where(x => x.ReviewerId != reviewer.ReviewerId)
-                    .Sum(x => x.Rate);
+                movie.Reviews = movie.Reviews.Where(x => x.ReviewerId != reviewer.ReviewerId).ToList();
+                
+                RecalculateTotalMovieScore(movie);
                 _unitOfWork.Movies.Update(movie);
             }            
 
@@ -103,8 +105,7 @@ namespace Movies.Data.Services
 
         protected void RecalculateTotalMovieScore(Movie movie)
         {            
-            movie.Rate = movie.Reviews.Select(x => x.Rate).Sum();
-                        
+            movie.Rate = movie.Reviews.Sum(x => x.Rate);
         }
 
         public async Task<Review> GetReviewAsync(int id)
