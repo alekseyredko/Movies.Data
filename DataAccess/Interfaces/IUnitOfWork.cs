@@ -16,7 +16,8 @@ namespace MoviesDataLayer.Interfaces
         IPersonRepository Persons { get; }
         IReviewRepository Reviews { get; }
         IReviewerRepository Reviewers { get; }
-       IReviewerWatchHistoryRepository ReviewersWatchHistory { get; }
+        IReviewerWatchHistoryRepository ReviewersWatchHistory { get; }
+        IUserRepository UserRepository { get; }
         Task<int> SaveAsync();
     }
 }

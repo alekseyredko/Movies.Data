@@ -26,6 +26,7 @@ namespace MoviesDataLayer
         private readonly IReviewRepository _reviewRepository;
         private readonly IReviewerRepository _reviewerRepository;
         private readonly IReviewerWatchHistoryRepository _reviewerWatchHistoryRepository;
+        private readonly IUserRepository _userRepository;
 
         public IActorRepository Actors => _actorRepository;
 
@@ -40,6 +41,7 @@ namespace MoviesDataLayer
         public IReviewerRepository Reviewers => _reviewerRepository;
 
         public IReviewerWatchHistoryRepository ReviewersWatchHistory => _reviewerWatchHistoryRepository;
+        public IUserRepository UserRepository => _userRepository;
 
         //public UnitOfWork(MoviesDBContext moviesDBContext)
         //{
@@ -53,7 +55,7 @@ namespace MoviesDataLayer
             IReviewRepository reviewRepository,
             IReviewerRepository reviewerRepository,
             IReviewerWatchHistoryRepository reviewerWatchHistoryRepository, 
-            MoviesDBContext moviesDBContext)
+            MoviesDBContext moviesDBContext, IUserRepository userRepository)
         {
             _actorRepository = actorRepository;
             _genreRepository = genreRepository;
@@ -63,6 +65,7 @@ namespace MoviesDataLayer
             _reviewerRepository = reviewerRepository;
             _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;
             _moviesDBContext = moviesDBContext;
+            _userRepository = userRepository;
         }
 
         public void Dispose()
