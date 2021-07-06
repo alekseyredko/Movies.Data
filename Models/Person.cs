@@ -13,5 +13,6 @@ namespace Movies.Data.Models
         public virtual Actor Actor { get; set; }
         public virtual Producer Producer { get; set; }
         public virtual Reviewer Reviewer { get; set; }
+        public virtual User User { get; set; }
     }
 }

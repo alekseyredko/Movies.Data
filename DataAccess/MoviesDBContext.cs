@@ -29,6 +29,7 @@ namespace Movies.Data.DataAccess
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Reviewer> Reviewers { get; set; }
         public virtual DbSet<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -219,6 +220,31 @@ namespace Movies.Data.DataAccess
                     .HasForeignKey<Reviewer>(d => d.ReviewerId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Reviewer__Review__34C8D9D1");
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("User");
+
+                entity.Property(e => e.UserId).ValueGeneratedNever();
+
+                entity.Property(e => e.NickName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.PasswordHash)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.PasswordSalt)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.HasOne(d => d.Person)
+                    .WithOne(p => p.User)
+                    .HasForeignKey<User>(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_User_Person");
             });
 
             OnModelCreatingPartial(modelBuilder);
