@@ -245,6 +245,8 @@ namespace Movies.Data.DataAccess
                     .HasForeignKey<User>(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_User_Person");
+
+                entity.Ignore(x => x.Password);
             });
 
             OnModelCreatingPartial(modelBuilder);
