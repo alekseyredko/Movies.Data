@@ -22,7 +22,7 @@ namespace Movies.Data.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<UserResponse> RegisterAsync(UserRequest userRequest)
+        public async Task<User> RegisterAsync(User userRequest)
         {
             //TODO: find by login and throw exception
 
@@ -39,16 +39,16 @@ namespace Movies.Data.Services
             var user = new User
             {
                 Person = person,
-                NickName = userRequest.Login,
+                Login = userRequest.Login,
                 PasswordSalt = hash.Item1,
                 PasswordHash = hash.Item2
             };
 
             await _unitOfWork.UserRepository.InsertAsync(user);
 
-            var userResponse = new UserResponse
+            var userResponse = new User
             {
-                Id = user.UserId,
+                UserId = user.UserId,
                 //Token = GetToken()
             };
 
@@ -62,7 +62,7 @@ namespace Movies.Data.Services
             var hash = SecurityHelper.HashPassword(password, salt);
             return (salt, hash);
         }
-        public async Task<UserResponse> LoginAsync(UserRequest request)
+        public async Task<User> LoginAsync(User request)
         {
             var user = await _unitOfWork.UserRepository.GetByLoginAsync(request.Login);
             if (user == null)
@@ -76,9 +76,9 @@ namespace Movies.Data.Services
                 throw new InvalidOperationException("Invalid password!");
             }
 
-            var userResponse = new UserResponse
+            var userResponse = new User
             {
-                Id = user.UserId,
+                UserId = user.UserId,
                 //Token = GetToken()
             };
 

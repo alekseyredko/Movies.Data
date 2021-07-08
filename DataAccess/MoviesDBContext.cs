@@ -228,7 +228,7 @@ namespace Movies.Data.DataAccess
 
                 entity.Property(e => e.UserId).ValueGeneratedNever();
 
-                entity.Property(e => e.NickName)
+                entity.Property(e => e.Login)
                     .IsRequired()
                     .HasMaxLength(50);
 
@@ -247,6 +247,8 @@ namespace Movies.Data.DataAccess
                     .HasConstraintName("FK_User_Person");
 
                 entity.Ignore(x => x.Password);
+                entity.Ignore(x => x.Name);
+                entity.Ignore(x => x.Token);
             });
 
             OnModelCreatingPartial(modelBuilder);

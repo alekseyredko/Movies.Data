@@ -9,7 +9,7 @@ namespace Movies.Data.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<UserResponse> RegisterAsync(UserRequest userRequest);
-        Task<UserResponse> LoginAsync(UserRequest request);
+        Task<User> RegisterAsync(User userRequest);
+        Task<User> LoginAsync(User request);
     }
 }

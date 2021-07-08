@@ -18,7 +18,7 @@ namespace Movies.Data.DataAccess.Repositiories
 
         public async Task<User> GetByLoginAsync(string login)
         {
-            var user = await context.Users.FirstOrDefaultAsync(x => x.NickName == login);
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Login == login);
             return user;
         }
     }
