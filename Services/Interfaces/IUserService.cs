@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Movies.Data.Models;
+using Movies.Data.Results;
 
 namespace Movies.Data.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<User> RegisterAsync(User userRequest);
-        Task<User> LoginAsync(User request);
+        Task<Result<User>> RegisterAsync(User userRequest);
+        Task<Result<User>> LoginAsync(User request);
     }
 }

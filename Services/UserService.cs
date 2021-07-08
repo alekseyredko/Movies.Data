@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ using AutoMapper.Mappers;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
+using Movies.Data.Results;
 using Movies.Data.Services.Interfaces;
 using MoviesDataLayer.Interfaces;
 
@@ -22,67 +24,104 @@ namespace Movies.Data.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<User> RegisterAsync(User userRequest)
+        public async Task<Result<User>> RegisterAsync(User userRequest)
         {
-            //TODO: find by login and throw exception
-
-            var person = new Person
+            var result = new Result<User>();
+            try
             {
-                PersonName = userRequest.Name
-            };
-            await _unitOfWork.Persons.InsertAsync(person);
-            //await _unitOfWork.Persons.AddPersonAsync(person);
-            await _unitOfWork.SaveAsync();
+                var getUser = await _unitOfWork.UserRepository.GetByLoginAsync(userRequest.Login);
 
-            (string, string) hash = HashPasswordAndGetSalt(userRequest.Password);
+                if (getUser != null)
+                {
+                    result.Value = userRequest;
+                    result.ResultType = ResultType.AlreadyExists;
+                    result.Title = "Please check your entered data";
+                    result.AddError(nameof(getUser.Login), "Account with this login already exists!");
+                    return result;
+                }
 
-            var user = new User
+                var person = new Person
+                {
+                    PersonName = userRequest.Name
+                };
+
+                await _unitOfWork.Persons.InsertAsync(person);
+
+                await _unitOfWork.SaveAsync();
+
+                (string, string) hash = HashPasswordAndGetSalt(userRequest.Password);
+
+                var user = new User
+                {
+                    Person = person,
+                    Login = userRequest.Login,
+                    PasswordSalt = hash.Item1,
+                    PasswordHash = hash.Item2
+                };
+
+                await _unitOfWork.UserRepository.InsertAsync(user);
+
+                var userResponse = new User
+                {
+                    UserId = user.UserId,
+                };
+
+                await _unitOfWork.SaveAsync();
+
+                result.Value = userResponse;
+                result.Title = "Registration successful!";
+            }
+            catch (Exception e)
             {
-                Person = person,
-                Login = userRequest.Login,
-                PasswordSalt = hash.Item1,
-                PasswordHash = hash.Item2
-            };
+                //TODO: log exception
+                result.ResultType = ResultType.Unexpected;
+                result.Value = null;
+                result.Title = "Sorry, please try again later!";
+            }
 
-            await _unitOfWork.UserRepository.InsertAsync(user);
-
-            var userResponse = new User
-            {
-                UserId = user.UserId,
-                //Token = GetToken()
-            };
-
-            await _unitOfWork.SaveAsync();
-            return userResponse;
+            return result;
         }
-        
+
         private (string, string) HashPasswordAndGetSalt(string password)
         {
             var salt = SecurityHelper.GenerateSalt();
             var hash = SecurityHelper.HashPassword(password, salt);
             return (salt, hash);
         }
-        public async Task<User> LoginAsync(User request)
+        public async Task<Result<User>> LoginAsync(User request)
         {
-            var user = await _unitOfWork.UserRepository.GetByLoginAsync(request.Login);
-            if (user == null)
+            var result = new Result<User>();
+            try
             {
-                throw new InvalidOperationException($"No such users with login: {request.Login}");
+                var user = await _unitOfWork.UserRepository.GetByLoginAsync(request.Login);
+                if (user == null)
+                {
+                    result.ResultType = ResultType.NotFound;
+                    result.Title = "Please check your entered data";
+                    result.AddError(nameof(user.Login), "No such account found! Check your login.");
+                    return result;
+                }
+
+                result.Value = user;
+
+                bool isVerified = SecurityHelper.IsVerified(request.Password, user.PasswordSalt, user.PasswordHash);
+                if (!isVerified)
+                {
+                    result.ResultType = ResultType.NotValid;
+                    result.Title = "Please check your entered data";
+                    result.AddError(nameof(user.Password), "Invalid password!");
+                    return result;
+                }
+                result.Title = "Login successful!";
             }
-
-            bool isVerified = SecurityHelper.IsVerified(request.Password, user.PasswordSalt, user.PasswordHash);
-            if (!isVerified)
+            catch (Exception e)
             {
-                throw new InvalidOperationException("Invalid password!");
+                //TODO: log exception
+                result.ResultType = ResultType.Unexpected;
+                result.Value = null;
+                result.Title = "Sorry, please try again later!";
             }
-
-            var userResponse = new User
-            {
-                UserId = user.UserId,
-                //Token = GetToken()
-            };
-
-            return userResponse;
+            return result;
         }
     }
 }
