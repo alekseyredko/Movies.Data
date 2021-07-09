@@ -84,13 +84,6 @@ namespace Movies.Data.Services
 
             await _unitOfWork.Reviewers.DeleteAsync(id);
 
-            //TODO: recalculate total movie score
-            //TODO: delete related reviews
-            //TODO: Recalculate all total movie score
-            //TODO: Define cascade delete in db
-
-            
-
             foreach (var reviewerMovie in reviewer.Movies)
             {
                 var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(reviewerMovie.MovieId);

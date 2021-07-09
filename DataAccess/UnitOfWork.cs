@@ -10,11 +10,6 @@ using System.Threading.Tasks;
 
 namespace MoviesDataLayer
 {
-
-    //TODO: implment CQRS
-    //TODO: get rid of Unit of work
-    //inject repos directly in Services
-    //implement specific repository interfaces
     public class UnitOfWork : IUnitOfWork
     {
         private MoviesDBContext _moviesDBContext;

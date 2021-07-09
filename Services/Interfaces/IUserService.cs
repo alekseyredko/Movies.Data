@@ -12,5 +12,7 @@ namespace Movies.Data.Services.Interfaces
     {
         Task<Result<User>> RegisterAsync(User userRequest);
         Task<Result<User>> LoginAsync(User request);
+        Task<Result<User>> UpdateAccountAsync(User request);
+        Task<Result<int>> DeleteAccountAsync(int id);
     }
 }

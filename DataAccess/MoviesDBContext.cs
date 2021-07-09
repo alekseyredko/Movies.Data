@@ -243,7 +243,7 @@ namespace Movies.Data.DataAccess
                 entity.HasOne(d => d.Person)
                     .WithOne(p => p.User)
                     .HasForeignKey<User>(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_User_Person");
 
                 entity.Ignore(x => x.Password);
