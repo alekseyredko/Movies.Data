@@ -9,6 +9,6 @@ namespace Movies.Data.Services.Interfaces
 {
     public interface IResultHandlerService
     {
-        Task<Result<T>> HandleTaskAsync<T>(T request, Result<T> result, Func<T, Result<T>, Task<Result<T>>> func);
+        Task<Result<T>> HandleTaskAsync<T>(T request, Func<T, Result<T>, Task<Result<T>>> func);
     }
 }

@@ -36,8 +36,7 @@ namespace Movies.Data.Services
 
         public Task<Result<User>> RegisterAsync(User userRequest)
         {
-            var result = new Result<User>();
-            return _resultHandlerService.HandleTaskAsync(userRequest, result, RegisterAsync);
+            return _resultHandlerService.HandleTaskAsync(userRequest, RegisterAsync);
         }
 
         protected async Task<Result<User>> RegisterAsync(User userRequest, Result<User> result)
@@ -89,8 +88,7 @@ namespace Movies.Data.Services
 
         public Task<Result<User>> LoginAsync(User request)
         {
-            var result = new Result<User>();
-            return _resultHandlerService.HandleTaskAsync(request, result, LoginAsync);
+            return _resultHandlerService.HandleTaskAsync(request, LoginAsync);
         }
 
         protected async Task<Result<User>> LoginAsync(User request, Result<User> result)
@@ -126,8 +124,7 @@ namespace Movies.Data.Services
 
         public Task<Result<User>> UpdateAccountAsync(User request)
         {
-            var result = new Result<User>();
-            return _resultHandlerService.HandleTaskAsync(request, result, UpdateAccountAsync);
+            return _resultHandlerService.HandleTaskAsync(request, UpdateAccountAsync);
         }
 
         protected async Task<Result<User>> UpdateAccountAsync(User request, Result<User> result)
@@ -203,8 +200,7 @@ namespace Movies.Data.Services
 
         public Task<Result<int>> DeleteAccountAsync(int id)
         {
-            var result = new Result<int>();
-            return _resultHandlerService.HandleTaskAsync(id, result, DeleteAccountAsync);
+            return _resultHandlerService.HandleTaskAsync(id, DeleteAccountAsync);
         }
 
         protected async Task<Result<int>> DeleteAccountAsync(int id, Result<int> result)
