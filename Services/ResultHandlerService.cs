@@ -27,5 +27,22 @@ namespace Movies.Data.Services
             }
             return result;
         }
+
+        public async Task<Result<T>> HandleTaskAsync<T>(Func<Result<T>, Task<Result<T>>> func)
+        {
+            var result = new Result<T>();
+            try
+            {
+                result = await func(result);
+            }
+            catch (Exception e)
+            {
+                //TODO: log exception
+                result.ResultType = ResultType.Unexpected;
+                result.Value = default(T);
+                result.Title = "Sorry, please try again later!";
+            }
+            return result;
+        }
     }
 }
