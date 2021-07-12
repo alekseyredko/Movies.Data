@@ -13,7 +13,9 @@ namespace Movies.Data.Models
         }
 
         public int ReviewerId { get; set; }
-        public double? PersonRate { get; set; }
+
+        public string NickName { get; set; }
+
         public virtual Person Person { get; set; }
         public virtual ICollection<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
         public virtual ICollection<Movie> Movies { get; set; }

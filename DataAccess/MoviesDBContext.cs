@@ -54,7 +54,7 @@ namespace Movies.Data.DataAccess
                 entity.HasOne(d => d.Person)
                     .WithOne(p => p.Actor)
                     .HasForeignKey<Actor>(d => d.ActorId)
-                    .OnDelete(DeleteBehavior.Cascade)                    
+                                        
                     .HasConstraintName("FK__Actor__ActorId__2D27B809");
             });
 
@@ -95,13 +95,13 @@ namespace Movies.Data.DataAccess
                         j => j.HasOne(d => d.Actor)
                             .WithMany(p => p.MoviesActors)
                             .HasForeignKey(d => d.ActorId)
-                            .OnDelete(DeleteBehavior.Cascade)
+                            
                             .HasConstraintName("FK__MoviesAct__Actor__4222D4EF"),
 
                         j => j.HasOne(d => d.Movie)
                             .WithMany(p => p.MoviesActors)
                             .HasForeignKey(d => d.MovieId)
-                            .OnDelete(DeleteBehavior.Cascade)
+                            
                             .HasConstraintName("FK__MoviesAct__Movie__4316F928"),
 
                         j => j.HasKey(e => new { e.ActorId, e.MovieId })
@@ -115,13 +115,13 @@ namespace Movies.Data.DataAccess
                         j => j.HasOne(d => d.Genre)
                             .WithMany(p => p.MovieGenres)
                             .HasForeignKey(d => d.GenreId)
-                            .OnDelete(DeleteBehavior.Cascade)
+                            
                             .HasConstraintName("FK__MovieGenr__Genre__3E52440B"),
 
                         j => j.HasOne(d => d.Movie)
                             .WithMany(p => p.MovieGenres)
                             .HasForeignKey(d => d.MovieId)
-                            .OnDelete(DeleteBehavior.Cascade)
+                            
                             .HasConstraintName("FK__MovieGenr__Movie__3F466844"),
 
                         j => j.HasKey(e => new { e.GenreId, e.MovieId })
@@ -177,7 +177,7 @@ namespace Movies.Data.DataAccess
                 entity.HasOne(d => d.Person)
                     .WithOne(p => p.Producer)
                     .HasForeignKey<Producer>(d => d.ProducerId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    
                     .HasConstraintName("FK_Producer_Person");
             });
 
@@ -199,13 +199,11 @@ namespace Movies.Data.DataAccess
                 entity.HasOne(d => d.Movie)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.MovieId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Review__MovieId__3A81B327");
 
                 entity.HasOne(d => d.Reviewer)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.ReviewerId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Review__Reviewer__3B75D760");
             });
 
@@ -215,10 +213,13 @@ namespace Movies.Data.DataAccess
 
                 entity.Property(e => e.ReviewerId).ValueGeneratedNever();
 
+                entity.Property(e => e.NickName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
                 entity.HasOne(d => d.Person)
                     .WithOne(p => p.Reviewer)
                     .HasForeignKey<Reviewer>(d => d.ReviewerId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Reviewer__Review__34C8D9D1");
             });
 
@@ -243,7 +244,6 @@ namespace Movies.Data.DataAccess
                 entity.HasOne(d => d.Person)
                     .WithOne(p => p.User)
                     .HasForeignKey<User>(d => d.UserId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_User_Person");
 
                 entity.Ignore(x => x.Password);
