@@ -209,7 +209,7 @@ namespace Movies.Data.Services
             var person = await _unitOfWork.Persons.GetByIDAsync(id);
 
             result.Value = id;
-            if (user == null)
+            if (user == null || person == null)
             {
                 result.Title = "Please check your data";
                 result.AddError(nameof(id), "No such account!");
@@ -217,14 +217,6 @@ namespace Movies.Data.Services
                 return result;
             }
 
-            if (person == null)
-            {
-                result.Title = "Please check your data";
-                result.AddError(nameof(id), "No such person found!");
-
-                return result;
-            }
-            
             await _unitOfWork.UserRepository.DeleteAsync(id);
             await _unitOfWork.SaveAsync();
 
