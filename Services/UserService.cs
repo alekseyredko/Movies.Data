@@ -49,6 +49,8 @@ namespace Movies.Data.Services
                 return result;
             }
 
+            user.Roles = await GetUserRolesAsync(id);
+
             _resultHandlerService.SetOk(user, result);
 
             return result;

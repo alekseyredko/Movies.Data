@@ -16,7 +16,7 @@ namespace Movies.Data.Models
         public string Password { get; set; }
         public string Name { get; set; }
         public string Token { get; set; }
-        public ICollection<UserRoles> Roles { get; set; }
+        public IEnumerable<UserRoles> Roles { get; set; }
 
         public virtual Person Person { get; set; }
 
