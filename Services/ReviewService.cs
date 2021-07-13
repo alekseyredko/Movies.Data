@@ -2,22 +2,26 @@
 using Movies.Data.Services.Interfaces;
 using MoviesDataLayer.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper.Configuration.Conventions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Movies.Data.Results;
 
 namespace Movies.Data.Services
 {
     public class ReviewService : IReviewService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public ReviewService(IUnitOfWork unitOfWork)
+        private readonly IResultHandlerService _resultHandlerService;
+        public ReviewService(IUnitOfWork unitOfWork, IResultHandlerService resultHandlerService)
         {
             _unitOfWork = unitOfWork;
+            _resultHandlerService = resultHandlerService;
         }
 
         public async Task AddReviewAsync(Review review, int movieId)
@@ -42,17 +46,33 @@ namespace Movies.Data.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task AddReviewerAsync(Reviewer reviewer)
+        public Task<Result<Reviewer>> AddReviewerAsync(Reviewer reviewer)
         {
-            try
+            return _resultHandlerService.HandleTaskAsync(reviewer, AddReviewerAsync);
+        }
+
+        protected async Task<Result<Reviewer>> AddReviewerAsync(Reviewer request, Result<Reviewer> result)
+        {
+            var reviewer = await _unitOfWork.Reviewers.GetByIDAsync(request.ReviewerId);
+
+            if (reviewer != null)
             {
-                await _unitOfWork.Reviewers.InsertAsync(reviewer);
-                await _unitOfWork.SaveAsync();
+                _resultHandlerService.SetExists(nameof(request.ReviewerId), result);
             }
-            catch (DbUpdateException e)
+
+            if (result.ResultType != ResultType.Ok)
             {
-                throw new InvalidOperationException($"Reviewer already exists in database with id: {reviewer.ReviewerId}");
+                return result;
             }
+
+            await _unitOfWork.Reviewers.InsertAsync(request);
+            await _unitOfWork.SaveAsync();
+
+            result.ResultType = ResultType.Ok;
+            result.Value = request;
+            result.Title = "Success!";
+
+            return result;
         }
 
         public async Task DeleteReviewAsync(int id)
@@ -74,26 +94,38 @@ namespace Movies.Data.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task DeleteReviewerAsync(int id)
+        public Task<Result> DeleteReviewerAsync(int id)
         {
-            var reviewer = await _unitOfWork.Reviewers.GetReviewerWithAllAsync(id);
+            return _resultHandlerService.HandleTaskAsync(id, DeleteReviewerAsync);
+        }
+
+        public async Task<Result> DeleteReviewerAsync(int id, Result result)
+        {
+            var reviewer = await _unitOfWork.Reviewers.GetByIDAsync(id);
             if (reviewer == null)
             {
-                throw new InvalidOperationException($"Reviewer not found in database with id: {id}");
+                _resultHandlerService.SetAccountNotFound("Id", result);
+                return result;
             }
 
             await _unitOfWork.Reviewers.DeleteAsync(id);
+
+            reviewer = await _unitOfWork.Reviewers.GetFullReviewerAsync(id);
 
             foreach (var reviewerMovie in reviewer.Movies)
             {
                 var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(reviewerMovie.MovieId);
                 movie.Reviews = movie.Reviews.Where(x => x.ReviewerId != reviewer.ReviewerId).ToList();
-                
+
                 RecalculateTotalMovieScore(movie);
                 _unitOfWork.Movies.Update(movie);
-            }            
+            }
 
             await _unitOfWork.SaveAsync();
+
+            _resultHandlerService.SetOk(result);
+
+            return result;
         }
 
         protected void RecalculateTotalMovieScore(Movie movie)
@@ -112,20 +144,28 @@ namespace Movies.Data.Services
             return review;
         }
 
-        public async Task<Reviewer> GetReviewerAsync(int id)
+        public Task<Result<Reviewer>> GetReviewerAsync(int id)
+        {
+            return _resultHandlerService.HandleTaskAsync<Reviewer, int>(id, GetReviewerAsyncResult);
+        }
+
+        protected async Task<Result<Reviewer>> GetReviewerAsyncResult(int id, Result<Reviewer> result)
         {
             var reviewer = await _unitOfWork.Reviewers.GetByIDAsync(id);
             if (reviewer == null)
             {
-                throw new InvalidOperationException($"Reviewer not found in database with id: {id}");
+                _resultHandlerService.SetNotFound(nameof(reviewer.ReviewerId), result);
+                return result;
             }
 
-            return reviewer;
+            _resultHandlerService.SetOk(reviewer, result);
+
+            return result;
         }
 
         public async Task<Reviewer> GetReviewerWithAllAsync(int id)
         {
-            var reviewer = await _unitOfWork.Reviewers.GetReviewerWithAllAsync(id);
+            var reviewer = await _unitOfWork.Reviewers.GetFullReviewerAsync(id);
             if (reviewer == null)
             {
                 throw new InvalidOperationException($"Reviewer not found in database with id: {id}");
@@ -134,9 +174,18 @@ namespace Movies.Data.Services
             return reviewer;
         }
 
-        public Task<IEnumerable<Reviewer>> GetAllReviewersAsync()
+        public Task<Result<IEnumerable<Reviewer>>> GetAllReviewersAsync()
         {
-            return _unitOfWork.Reviewers.GetAllAsync();
+            return _resultHandlerService.HandleTaskAsync<IEnumerable<Reviewer>>(GetReviewersAsync);
+        }
+
+        protected async Task<Result<IEnumerable<Reviewer>>> GetReviewersAsync(Result<IEnumerable<Reviewer>> result)
+        {
+            var reviewers = await _unitOfWork.Reviewers.GetAllAsync();
+
+            _resultHandlerService.SetOk(reviewers, result);
+
+            return result;
         }
 
         public Task<IEnumerable<Review>> GetAllReviewsAsync()
@@ -144,13 +193,56 @@ namespace Movies.Data.Services
             return _unitOfWork.Reviews.GetAllAsync();
         }
 
-        public async Task UpdateReviewerAsync(Reviewer reviewer)
+        public Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer reviewer)
         {
-            _unitOfWork.Reviewers.Update(reviewer);
-            await _unitOfWork.SaveAsync();
+            return _resultHandlerService.HandleTaskAsync(reviewer, UpdateReviewerAsync);
         }
 
-        public async Task UpdateReviewService(Review review)
+        public async Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer request, Result<Reviewer> result)
+        {
+            var getReviewer = await _unitOfWork.Reviewers.GetByIDAsync(request.ReviewerId);
+
+            if (getReviewer == null)
+            {
+                _resultHandlerService.SetNotFound(nameof(request.ReviewerId), result);
+                return result;
+            }
+
+            if (request.NickName != null)
+            {
+                var nickNameAreNotSame = _resultHandlerService.CheckStringPropsAreEqual(request.NickName,
+                    getReviewer.NickName, nameof(request.NickName), result);
+
+                if (nickNameAreNotSame)
+                {
+                    var getAnother = await _unitOfWork.Reviewers.GetByNickNameAsync(request.NickName);
+
+                    if (getAnother != null)
+                    {
+                        _resultHandlerService.SetExists(nameof(request.NickName), result);
+                    }
+                    else
+                    {
+                        getReviewer.NickName = request.NickName;
+                    }
+                }
+            }
+
+
+            if (result.ResultType != ResultType.Ok)
+            {
+                return result;
+            }
+            
+            _resultHandlerService.SetOk(getReviewer, result);
+
+            _unitOfWork.Reviewers.Update(getReviewer);
+            await _unitOfWork.SaveAsync();
+
+            return result;
+        }
+
+        public async Task UpdateReviewAsync(Review review)
         {
             _unitOfWork.Reviews.Update(review);
             await _unitOfWork.SaveAsync();
