@@ -17,5 +17,6 @@ namespace Movies.Data.DataAccess.Interfaces
         Task<Movie> GetMovieWithAllAsync(int movieId);
         Task<Movie> GetMovieWithReviewsAsync(int movieId);
         Task<Movie> GetMovieWithReviewersAsync(int movieId);
+        Task<Movie> GetMovieByNameAsync(string movieName);
     }
 }

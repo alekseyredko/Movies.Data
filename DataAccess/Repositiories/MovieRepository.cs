@@ -80,9 +80,20 @@ namespace Movies.Data.DataAccess.Repositiories
         public async Task<Movie> GetMovieWithReviewersAsync(int movieId)
         {
             var movie = await context.Movies.FirstAsync(x => x.MovieId == movieId);
+
+            if (movie == null)
+            {
+                return null;
+            }
+
             await context.Entry(movie).Collection(x => x.Reviewers).LoadAsync();
 
             return movie;
+        }
+
+        public Task<Movie> GetMovieByNameAsync(string movieName)
+        {
+            return context.Movies.FirstOrDefaultAsync(x => x.MovieName.ToLower() == movieName.ToLower());
         }
     }
 }

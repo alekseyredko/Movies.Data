@@ -2,55 +2,93 @@
 using MoviesDataLayer.Interfaces;
 using Movies.Data.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Movies.Data.Results;
 
 namespace Movies.Data.Services
 {
     public class MovieService : IMovieService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public MovieService(IUnitOfWork unitOfWork)
+        private readonly IResultHandlerService _resultHandlerService;
+        public MovieService(IUnitOfWork unitOfWork, IResultHandlerService resultHandlerService)
         {
             _unitOfWork = unitOfWork;
-        }        
-
-        public async Task AddMovieAsync(Movie movie)
-        {
-            try
-            {
-                await _unitOfWork.Movies.InsertAsync(movie);
-                await _unitOfWork.SaveAsync();
-            }
-            catch (DbUpdateException e)
-            {
-                throw new InvalidOperationException($"Movie already exists in database with id: {movie.MovieId}");
-            }
-        }        
-
-        public async Task DeleteMovieAsync(int id)
-        {
-            try
-            {
-                await _unitOfWork.Movies.DeleteAsync(id);
-                await _unitOfWork.SaveAsync();
-            }
-            catch (ArgumentNullException e)
-            {
-                Console.WriteLine(e);
-                throw new InvalidOperationException($"Movie not found in database with id: {id}");
-            }
+            _resultHandlerService = resultHandlerService;
         }
 
-        public async Task<IEnumerable<Movie>> GetAllMoviesAsync()
+        public Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie)
+        {
+            movie.ProducerId = producerId;
+            return _resultHandlerService.HandleTaskAsync(movie, AddMovieAsync);
+        }
+
+        protected async Task<Result<Movie>> AddMovieAsync(Movie request, Result<Movie> result)
+        {
+            var getMovie = await _unitOfWork.Movies.GetMovieByNameAsync(request.MovieName);
+
+            if (getMovie!=null)
+            {
+                _resultHandlerService.SetExists(nameof(request.MovieName), result);
+                return result;
+            }
+
+            await _unitOfWork.Movies.InsertAsync(request);
+            await _unitOfWork.SaveAsync();
+
+            _resultHandlerService.SetOk(request, result);
+            return result;
+        }
+
+        public Task<Result> DeleteMovieAsync(int producerId, int movieId)
+        {
+            return _resultHandlerService.HandleTaskAsync(producerId, movieId, DeleteMovieAsync);
+        }
+
+        public async Task<Result> DeleteMovieAsync(int producerId, int movieId, Result result)
+        {
+            var getMovie = await _unitOfWork.Movies.GetByIDAsync(movieId);
+
+            if (getMovie == null)
+            {
+                _resultHandlerService.SetNotFound("MovieId", typeof(Movie), result);
+                return result;
+            }
+
+            if (getMovie.ProducerId != producerId)
+            {
+                result.ResultType = ResultType.Forbidden;
+                result.Title = "Cannot delete movie from another producer";
+                result.AddError(nameof(getMovie.ProducerId), "Cannot delete movie from another producer");
+                return result;
+            }
+
+            await _unitOfWork.Movies.DeleteAsync(movieId);
+            await _unitOfWork.SaveAsync();
+
+            _resultHandlerService.SetOk(result);
+
+            return result;
+        }
+
+        public Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync()
+        {
+            return _resultHandlerService.HandleTaskAsync<IEnumerable<Movie>>(GetMoviesAsync);
+        }
+
+        protected async Task<Result<IEnumerable<Movie>>> GetMoviesAsync(Result<IEnumerable<Movie>> result)
         {
             var movies = await _unitOfWork.Movies.GetAllAsync();
-            return movies;
+
+            _resultHandlerService.SetOk(movies, result);
+
+            return result;
         }
 
         public async Task DeleteActorFromMovieAsync(int movieId, int actorId)
@@ -109,16 +147,79 @@ namespace Movies.Data.Services
             return movie.Actors;
         }
 
-        public async Task<Movie> GetMovieAsync(int id)
+        public Task<Result<Movie>> GetMovieAsync(int id)
+        {
+            return _resultHandlerService.HandleTaskAsync<Movie, int>(id, GetMovieAsync);
+        }
+
+        protected async Task<Result<Movie>> GetMovieAsync(int id, Result<Movie> result)
         {
             var movie = await _unitOfWork.Movies.GetByIDAsync(id);
             if (movie == null)
             {
-                throw new InvalidOperationException($"Movie not found in database with id: {id}");
+                _resultHandlerService.SetNotFound(nameof(movie.MovieId), result);
+                return result;
             }
 
-            return movie;
-        }       
+            _resultHandlerService.SetOk(movie, result);
+
+            return result;
+        }
+
+        public Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie movie)
+        {
+            return _resultHandlerService.HandleTaskAsync(producerId, movieId, movie, UpdateMovieAsync);
+        }
+
+        protected async Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie request, Result<Movie> result)
+        {
+            var getMovie = await _unitOfWork.Movies.GetByIDAsync(movieId);
+
+            if (getMovie == null)
+            {
+                _resultHandlerService.SetNotFound(nameof(request.MovieId), result);
+                return result;
+            }
+
+            if (getMovie.ProducerId != producerId)
+            {
+                result.ResultType = ResultType.Forbidden;
+                result.Title = "Cannot update movie from another producer";
+                result.AddError(nameof(getMovie.ProducerId), "Cannot update movie from another producer");
+                return result;
+            }
+
+            var namesAreNotSame = _resultHandlerService.CheckStringPropsAreEqual(request.MovieName,
+                getMovie.MovieName, nameof(request.MovieName), result);
+
+            if (namesAreNotSame)
+            {
+                var anotherMovie = await _unitOfWork.Movies.GetMovieByNameAsync(request.MovieName);
+
+                if (anotherMovie != null)
+                {
+                    _resultHandlerService.SetExists(nameof(request.MovieName), result);
+                }
+                else
+                {
+                    getMovie.MovieName = request.MovieName;
+                }
+            }
+
+            getMovie.Duration = request.Duration;
+
+            if (result.ResultType != ResultType.Ok)
+            {
+                return result;
+            }
+
+            _resultHandlerService.SetOk(getMovie, result);
+
+            _unitOfWork.Movies.Update(getMovie);
+            await _unitOfWork.SaveAsync();
+
+            return result;
+        }
 
         public async Task<Movie> GetMovieWithReviewsAsync(int id)
         {
@@ -129,12 +230,6 @@ namespace Movies.Data.Services
             }
 
             return movie;
-        }
-
-        public async Task UpdateMovieAsync(Movie movie)
-        {
-            _unitOfWork.Movies.Update(movie);
-            await _unitOfWork.SaveAsync();
         }
     }
 }

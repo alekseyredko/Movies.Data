@@ -61,6 +61,38 @@ namespace Movies.Data.Services
             return result;
         }
 
+        public async Task<Result> HandleTaskAsync<T, T1>(T issuer, T1 entityId, Func<T, T1, Result, Task<Result>> func)
+        {
+            var result = new Result();
+            try
+            {
+                result = await func(issuer, entityId, result);
+            }
+            catch (Exception e)
+            {
+                //TODO: log exception
+                result.ResultType = ResultType.Unexpected;
+                result.Title = "Sorry, please try again later!";
+            }
+            return result;
+        }
+
+        public async Task<Result<T2>> HandleTaskAsync<T, T1, T2>(T issuer, T1 entityId, T2 request, Func<T, T1, T2, Result<T2>, Task<Result<T2>>> func)
+        {
+            var result = new Result<T2>();
+            try
+            {
+                result = await func(issuer, entityId, request, result);
+            }
+            catch (Exception e)
+            {
+                //TODO: log exception
+                result.ResultType = ResultType.Unexpected;
+                result.Title = "Sorry, please try again later!";
+            }
+            return result;
+        }
+
         public async Task<Result<T>> HandleTaskAsync<T>(Func<Result<T>, Task<Result<T>>> func)
         {
             var result = new Result<T>();
@@ -77,6 +109,8 @@ namespace Movies.Data.Services
             }
             return result;
         }
+
+
 
         public bool CheckStringPropsAreEqual<T>(string prop1, string prop2, string propName, Result<T> result)
         {
@@ -102,6 +136,13 @@ namespace Movies.Data.Services
             result.ResultType = ResultType.NotFound;
             result.Title = "Please check your entered data";
             result.AddError(propName, $"No such {typeof(T).Name} found! Check your {propName}");
+        }
+
+        public void SetNotFound(string propName, Type type, Result result)
+        {
+            result.ResultType = ResultType.NotFound;
+            result.Title = "Please check your entered data";
+            result.AddError(propName, $"No such {type.Name} found! Check your {propName}");
         }
 
         public void SetAccountNotFound(string propName, Result result)

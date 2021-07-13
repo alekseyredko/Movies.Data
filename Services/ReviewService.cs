@@ -228,7 +228,6 @@ namespace Movies.Data.Services
                 }
             }
 
-
             if (result.ResultType != ResultType.Ok)
             {
                 return result;

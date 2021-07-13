@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Movies.Data.Results;
 
@@ -19,5 +16,10 @@ namespace Movies.Data.Services.Interfaces
         Task<Result> HandleTaskAsync<T>(T request, Func<T, Result, Task<Result>> func);
         void SetAccountNotFound(string propName, Result result);
         void SetOk(Result result);
+        Task<Result> HandleTaskAsync<T, T1>(T issuer, T1 entityId, Func<T, T1, Result, Task<Result>> func);
+        void SetNotFound(string propName, Type type, Result result);
+
+        public Task<Result<T2>> HandleTaskAsync<T, T1, T2>(T issuer, T1 entityId, T2 request,
+            Func<T, T1, T2, Result<T2>, Task<Result<T2>>> func);
     }
 }

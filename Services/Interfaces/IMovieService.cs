@@ -1,6 +1,7 @@
 ﻿using Movies.Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Movies.Data.Results;
 
 namespace Movies.Data.Services.Interfaces
 {
@@ -8,17 +9,15 @@ namespace Movies.Data.Services.Interfaces
     {
         Task AddActorToMovieAsync(int movieId, int actorId);
         Task DeleteActorFromMovieAsync(int movieId, int actorId);
-        Task AddMovieAsync(Movie movie);
-        Task UpdateMovieAsync(Movie movie);
-        Task<Movie> GetMovieAsync(int id);        
+        Task<Result<Movie>> GetMovieAsync(int id);
         Task<IEnumerable<Actor>> GetMovieActorsAsync(int movieId);
-        Task<IEnumerable<Movie>> GetAllMoviesAsync();
+        Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync();
         Task<IEnumerable<Movie>> GetAllMoviesWithInfoAsync();
-        Task DeleteMovieAsync(int id);
         Task<Movie> GetMovieWithReviewsAsync(int id);
-        //    Task AddReviewAsync(int movieId, Review review);
-        //    Task DeleteReviewAsync(int movieId, int reviewId);
-        //    Task<Movie> GetMovieWithReviewAsync(int movieId);
-        //    Task<IEnumerable<Review>> GetMovieReviews(int movieId);
+   
+
+        Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie);
+        Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie movie);
+        Task<Result> DeleteMovieAsync(int producerId, int movieId);
     }
 }
