@@ -39,11 +39,25 @@ namespace Movies.Data.DataAccess.Repositiories
             await context.People.AddAsync(person);
         }
 
+
         public async Task<Person> GetPersonWithActorAsync(int id)
         {
             var person = await context.People.SingleAsync(x => x.PersonId == id);
             await context.Entry(person).Reference(x => x.Actor).LoadAsync();
             
+            return person;
+        }
+
+        public async Task<Person> GetFullPersonAsync(int id)
+        {
+            var person = await context.People.SingleOrDefaultAsync(x => x.PersonId == id);
+            if (person == null)
+            {
+                return null;
+            }
+            await context.Entry(person).Reference(x => x.Actor).LoadAsync();
+            await context.Entry(person).Reference(x => x.Producer).LoadAsync();
+            await context.Entry(person).Reference(x => x.Reviewer).LoadAsync();
             return person;
         }
     }

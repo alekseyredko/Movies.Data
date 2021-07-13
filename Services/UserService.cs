@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Mappers;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
@@ -34,6 +35,25 @@ namespace Movies.Data.Services
             return (salt, hash);
         }
 
+        public Task<Result<User>> GetUserAccountAsync(int id)
+        {
+            return _resultHandlerService.HandleTaskAsync<User, int>(id, GetUserAsync);
+        }
+
+        protected async Task<Result<User>> GetUserAsync(int id, Result<User> result)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIDAsync(id);
+            if (user == null)
+            {
+                _resultHandlerService.SetNotFound(nameof(user.UserId), result);
+                return result;
+            }
+
+            _resultHandlerService.SetOk(user, result);
+
+            return result;
+        }
+
         public Task<Result<User>> RegisterAsync(User userRequest)
         {
             return _resultHandlerService.HandleTaskAsync(userRequest, RegisterAsync);
@@ -45,10 +65,7 @@ namespace Movies.Data.Services
 
             if (getUser != null)
             {
-                result.Value = userRequest;
-                result.ResultType = ResultType.AlreadyExists;
-                result.Title = "Please check your entered data";
-                result.AddError(nameof(getUser.Login), "Account with this login already exists!");
+                _resultHandlerService.SetExists(nameof(getUser.Login), result);
                 return result;
             }
 
@@ -96,7 +113,8 @@ namespace Movies.Data.Services
             var user = await _unitOfWork.UserRepository.GetByLoginAsync(request.Login);
             if (user == null)
             {
-                return ReturnUserNotFoundResult(result);
+                _resultHandlerService.SetNotFound(nameof(request.Login), result);
+                return result;
             }
 
             result.Value = user;
@@ -114,13 +132,6 @@ namespace Movies.Data.Services
             return result;
         }
 
-        private static Result<User> ReturnUserNotFoundResult(Result<User> result)
-        {
-            result.ResultType = ResultType.NotFound;
-            result.Title = "Please check your entered data";
-            result.AddError(nameof(User.Login), "No such account found! Check your login.");
-            return result;
-        }
 
         public Task<Result<User>> UpdateAccountAsync(User request)
         {
@@ -132,7 +143,8 @@ namespace Movies.Data.Services
             var user = await _unitOfWork.UserRepository.GetByIDAsync(request.UserId);
             if (user == null)
             {
-                return ReturnUserNotFoundResult(result);
+                _resultHandlerService.SetAccountNotFound(nameof(request.Login), result);
+                return result;
             }
 
             var person = await _unitOfWork.Persons.GetByIDAsync(user.UserId);
@@ -144,42 +156,54 @@ namespace Movies.Data.Services
                 return result;
             }
 
-            if (!string.IsNullOrEmpty(user.Login) && user.Login == request.Login)
+            if (request.Login != null)
             {
-                result.ResultType = ResultType.AlreadyExists;
-                result.Title = "Please check your data";
-                result.AddError("Login", "Old and new login are the same");
-            }
-            else if (!string.IsNullOrEmpty(request.Login))
-            {
-                user.Login = request.Login;
+                var loginsAreNotSame =
+                    _resultHandlerService.CheckStringPropsAreEqual(request.Login, user.Login, nameof(request.Login),
+                        result);
+
+                if (loginsAreNotSame)
+                {
+                    var getAnother = await _unitOfWork.UserRepository.GetByLoginAsync(request.Login);
+                    if (getAnother != null)
+                    {
+                        _resultHandlerService.SetExists(nameof(request.Login), result);
+                    }
+                    else
+                    {
+                        user.Login = request.Login;
+                    }
+                }
             }
 
-            if (!string.IsNullOrEmpty(user.Password) &&
-                user.PasswordHash == SecurityHelper.HashPassword(request.Password, user.PasswordSalt))
+            if (request.Name != null)
             {
-                result.ResultType = ResultType.AlreadyExists;
-                result.Title = "Please check your data";
-                result.AddError("Password", "Old and new password are the same");
-            }
-            else if (!string.IsNullOrEmpty(request.Password))
-            {
-                var salt = SecurityHelper.GenerateSalt();
-                var hash = SecurityHelper.HashPassword(request.Password, salt);
-                user.PasswordHash = hash;
-                user.PasswordSalt = salt;
+                var namesAreNotSame =
+                    _resultHandlerService.CheckStringPropsAreEqual(request.Name, person.PersonName, nameof(request.Name), 
+                        result);
+
+                if (namesAreNotSame)
+                {
+                    person.PersonName = request.Name;
+                }
             }
 
-            if (!string.IsNullOrEmpty(user.Name) &&
-                    request.Name == person.PersonName)
+            if (request.Password != null)
             {
-                result.ResultType = ResultType.AlreadyExists;
-                result.Title = "Please check your data";
-                result.AddError("Name", "Old and new name are the same");
-            }
-            else if (!string.IsNullOrEmpty(request.Name))
-            {
-                person.PersonName = request.Name;
+                if (!string.IsNullOrEmpty(user.Password) &&
+                    user.PasswordHash == SecurityHelper.HashPassword(request.Password, user.PasswordSalt))
+                {
+                    result.ResultType = ResultType.AlreadyExists;
+                    result.Title = "Please check your data";
+                    result.AddError("Password", "Old and new password are the same");
+                }
+                else if (!string.IsNullOrEmpty(request.Password))
+                {
+                    var salt = SecurityHelper.GenerateSalt();
+                    var hash = SecurityHelper.HashPassword(request.Password, salt);
+                    user.PasswordHash = hash;
+                    user.PasswordSalt = salt;
+                }
             }
 
             if (result.ResultType != ResultType.Ok)
@@ -192,27 +216,24 @@ namespace Movies.Data.Services
 
             await _unitOfWork.SaveAsync();
 
-            result.Value = request;
-            result.Title = "Successful update!";
+            _resultHandlerService.SetOk(request, result);
 
             return result;
         }
 
-        public Task<Result<int>> DeleteAccountAsync(int id)
+        public Task<Result> DeleteAccountAsync(int id)
         {
             return _resultHandlerService.HandleTaskAsync(id, DeleteAccountAsync);
         }
 
-        protected async Task<Result<int>> DeleteAccountAsync(int id, Result<int> result)
+        protected async Task<Result> DeleteAccountAsync(int id, Result result)
         {
             var user = await _unitOfWork.UserRepository.GetByIDAsync(id);
             var person = await _unitOfWork.Persons.GetByIDAsync(id);
 
-            result.Value = id;
             if (user == null || person == null)
             {
-                result.Title = "Please check your data";
-                result.AddError(nameof(id), "No such account!");
+                _resultHandlerService.SetAccountNotFound("Id", result);
 
                 return result;
             }
@@ -223,6 +244,31 @@ namespace Movies.Data.Services
             result.Title = "Successfully deleted";
 
             return result;
+        }
+
+        public async Task<IEnumerable<UserRoles>> GetUserRolesAsync(int id)
+        {
+            var roles = new List<UserRoles>();
+            var person = await _unitOfWork.Persons.GetFullPersonAsync(id);
+
+            roles.Add(UserRoles.Person);
+
+            if (person.Actor != null)
+            {
+                roles.Add(UserRoles.Actor);
+            }
+
+            if (person.Producer !=null)
+            {
+                roles.Add(UserRoles.Producer);
+            }
+
+            if (person.Reviewer != null)
+            {
+                roles.Add(UserRoles.Reviewer);
+            }
+
+            return roles;
         }
     }
 }

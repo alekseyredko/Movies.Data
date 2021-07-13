@@ -28,19 +28,24 @@ namespace Movies.Data.DataAccess.Repositiories
             return reviewers;
         }
 
-        public async Task<Reviewer> GetReviewerWithAllAsync(int reviewerId)
+        public async Task<Reviewer> GetFullReviewerAsync(int reviewerId)
         {
             var reviewer = await context.Reviewers.FindAsync(reviewerId);
 
             if (reviewer == null)
             {
-                throw new InvalidOperationException($"Reviewer not found in database with id: {reviewerId}");
+                return null;
             }
 
             await context.Entry(reviewer).Collection(x => x.Movies).LoadAsync();
             await context.Entry(reviewer).Collection(x => x.Reviews).LoadAsync();
 
             return reviewer;
+        }
+
+        public Task<Reviewer> GetByNickNameAsync(string nickname)
+        {
+            return context.Reviewers.FirstOrDefaultAsync(x => string.Equals(x.NickName, nickname, StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task<Reviewer> GetReviewerWithMoviesAsync(int reviewerId)

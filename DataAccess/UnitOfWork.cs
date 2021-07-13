@@ -18,6 +18,7 @@ namespace MoviesDataLayer
         private readonly IGenreRepository _genreRepository;
         private readonly IMovieRepository _movieRepository;
         private readonly IPersonRepository _personRepository;
+        private readonly IProducerRepository _producerRepository;
         private readonly IReviewRepository _reviewRepository;
         private readonly IReviewerRepository _reviewerRepository;
         private readonly IReviewerWatchHistoryRepository _reviewerWatchHistoryRepository;
@@ -30,6 +31,8 @@ namespace MoviesDataLayer
         public IMovieRepository Movies => _movieRepository;
 
         public IPersonRepository Persons => _personRepository;
+
+        public IProducerRepository Producers => _producerRepository;
 
         public IReviewRepository Reviews => _reviewRepository;
 
@@ -50,7 +53,7 @@ namespace MoviesDataLayer
             IReviewRepository reviewRepository,
             IReviewerRepository reviewerRepository,
             IReviewerWatchHistoryRepository reviewerWatchHistoryRepository, 
-            MoviesDBContext moviesDBContext, IUserRepository userRepository)
+            MoviesDBContext moviesDBContext, IUserRepository userRepository, IProducerRepository producerRepository)
         {
             _actorRepository = actorRepository;
             _genreRepository = genreRepository;
@@ -61,6 +64,7 @@ namespace MoviesDataLayer
             _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;
             _moviesDBContext = moviesDBContext;
             _userRepository = userRepository;
+            _producerRepository = producerRepository;
         }
 
         public void Dispose()

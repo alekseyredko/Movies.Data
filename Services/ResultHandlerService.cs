@@ -28,6 +28,39 @@ namespace Movies.Data.Services
             return result;
         }
 
+        public async Task<Result<T>> HandleTaskAsync<T, T1>(T1 request, Func<T1, Result<T>, Task<Result<T>>> func)
+        {
+            var result = new Result<T>();
+            try
+            {
+                result = await func(request, result);
+            }
+            catch (Exception e)
+            {
+                //TODO: log exception
+                result.ResultType = ResultType.Unexpected;
+                result.Value = default(T);
+                result.Title = "Sorry, please try again later!";
+            }
+            return result;
+        }
+
+        public async Task<Result> HandleTaskAsync<T>(T request, Func<T, Result, Task<Result>> func)
+        {
+            var result = new Result();
+            try
+            {
+                result = await func(request, result);
+            }
+            catch (Exception e)
+            {
+                //TODO: log exception
+                result.ResultType = ResultType.Unexpected;
+                result.Title = "Sorry, please try again later!";
+            }
+            return result;
+        }
+
         public async Task<Result<T>> HandleTaskAsync<T>(Func<Result<T>, Task<Result<T>>> func)
         {
             var result = new Result<T>();
@@ -43,6 +76,59 @@ namespace Movies.Data.Services
                 result.Title = "Sorry, please try again later!";
             }
             return result;
+        }
+
+        public bool CheckStringPropsAreEqual<T>(string prop1, string prop2, string propName, Result<T> result)
+        {
+            if (string.IsNullOrEmpty(prop1))
+            {
+                result.ResultType = ResultType.NotValid;
+                result.AddError(propName, $"{propName} mustn't be empty!");
+                return false;
+            }
+            else if (prop1.Equals(prop2, StringComparison.OrdinalIgnoreCase))
+            {
+                result.ResultType = ResultType.AlreadyExists;
+                result.Title = "Please check your data";
+                result.AddError(propName, $"Old and new {propName} are the same");
+                return false;
+            }
+
+            return true;
+        }
+
+        public void SetNotFound<T>(string propName, Result<T> result)
+        {
+            result.ResultType = ResultType.NotFound;
+            result.Title = "Please check your entered data";
+            result.AddError(propName, $"No such {typeof(T).Name} found! Check your {propName}");
+        }
+
+        public void SetAccountNotFound(string propName, Result result)
+        {
+            result.ResultType = ResultType.NotFound;
+            result.Title = "Please check your entered data";
+            result.AddError(propName, $"No such account found! Check your {propName}");
+        }
+
+        public void SetExists<T>(string propName, Result<T> result)
+        {
+            result.ResultType = ResultType.AlreadyExists;
+            result.Title = "Please check your entered data";
+            result.AddError(propName, $"Another {typeof(T).Name} with such {propName} already exists!");
+        }
+
+        public void SetOk<T>(T value, Result<T> result)
+        {
+            result.Value = value;
+            result.ResultType = ResultType.Ok;
+            result.Title = "Success!";
+        }
+
+        public void SetOk(Result result)
+        {
+            result.ResultType = ResultType.Ok;
+            result.Title = "Success!";
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Movies.Data.DataAccess.Interfaces
         Task<IEnumerable<Reviewer>> GetAllReviewersWithAllAsync();
         Task<Reviewer> GetReviewerWithReviewsAsync(int reviewerId);
         Task<Reviewer> GetReviewerWithMoviesAsync(int reviewerId);
-        Task<Reviewer> GetReviewerWithAllAsync(int reviewerId);
+        Task<Reviewer> GetFullReviewerAsync(int reviewerId);
+        Task<Reviewer> GetByNickNameAsync(string nickname);
     }
 }

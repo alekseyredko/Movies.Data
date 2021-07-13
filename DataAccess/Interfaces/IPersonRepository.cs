@@ -23,5 +23,6 @@ namespace Movies.Data.DataAccess.Interfaces
         //Task AddProducerAsync(Producer producer);
         //Task AddReviewerAsync(Reviewer reviewer);
 
+        Task<Person> GetFullPersonAsync(int id);
     }
 }

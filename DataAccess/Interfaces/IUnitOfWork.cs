@@ -14,6 +14,7 @@ namespace MoviesDataLayer.Interfaces
         IGenreRepository Genres { get; }
         IMovieRepository Movies { get; }
         IPersonRepository Persons { get; }
+        IProducerRepository Producers { get; }
         IReviewRepository Reviews { get; }
         IReviewerRepository Reviewers { get; }
         IReviewerWatchHistoryRepository ReviewersWatchHistory { get; }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Movies.Data.Models;
 
 namespace MoviesDataLayer
 {
@@ -116,6 +117,19 @@ namespace MoviesDataLayer
         public async Task SaveAsync()
         {
             await context.SaveChangesAsync();
+        }
+
+        public async Task<Person> GetFullPersonWithAsync(int id)
+        {
+            var person = await context.People.SingleOrDefaultAsync(x => x.PersonId == id);
+            if (person == null)
+            {
+                return null;
+            }
+            await context.Entry(person).Reference(x => x.Actor).LoadAsync();
+            await context.Entry(person).Reference(x => x.Producer).LoadAsync();
+            await context.Entry(person).Reference(x => x.Reviewer).LoadAsync();
+            return person;
         }
     }
 }
