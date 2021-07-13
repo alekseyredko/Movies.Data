@@ -157,11 +157,6 @@ namespace Movies.Data.DataAccess
             {
                 entity.ToTable("Person");
 
-                //entity.HasIndex(e => e.PersonName, "UQ__Person__B88311BE6306F845")
-                //    .IsUnique();
-
-                //entity.Property(e => e.PersonId).ValueGeneratedNever();
-
                 entity.Property(e => e.PersonName)
                     .IsRequired()
                     .HasMaxLength(255)
@@ -173,6 +168,10 @@ namespace Movies.Data.DataAccess
                 entity.ToTable("Producer");
 
                 entity.Property(e => e.ProducerId).ValueGeneratedNever();
+
+                entity.Property(e => e.Country)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.HasOne(d => d.Person)
                     .WithOne(p => p.Producer)

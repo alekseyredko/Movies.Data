@@ -12,6 +12,7 @@ namespace Movies.Data.Models
             Movies = new HashSet<Movie>();
         }
 
+        public string Country { get; set; }
         public int ProducerId { get; set; }
         public virtual Person Person { get; set; }
         public virtual ICollection<Movie> Movies { get; set; }
