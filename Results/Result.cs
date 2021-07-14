@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using FluentValidation.Results;
 
 namespace Movies.Data.Results
 {
@@ -33,6 +34,14 @@ namespace Movies.Data.Results
                 errorsDesc = new List<string>();
                 errorsDesc.Add(errorDesc);
                 Errors.Add(propertyError, errorsDesc);
+            }
+        }
+
+        public void AddErrors(IEnumerable<ValidationFailure> failures)
+        {
+            foreach (var failure in failures)
+            {
+                AddError(failure.PropertyName, failure.ErrorMessage);
             }
         }
     }
