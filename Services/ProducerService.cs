@@ -24,7 +24,8 @@ namespace Movies.Data.Services
 
         public Task<Result<IEnumerable<Producer>>> GetAllProducersAsync()
         {
-            return _resultHandlerService.HandleTaskAsync<IEnumerable<Producer>>(GetAllProducersAsync);
+            var result = new Result<IEnumerable<Producer>>();
+            return _resultHandlerService.HandleTaskAsync(result, GetAllProducersAsync(result));
         }
 
         protected async Task<Result<IEnumerable<Producer>>> GetAllProducersAsync(Result<IEnumerable<Producer>> result)
@@ -38,7 +39,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Producer>> GetProducerAsync(int id)
         {
-            return _resultHandlerService.HandleTaskAsync<Producer, int>(id, GetProducerAsync);
+            var result = new Result<Producer>();
+            return _resultHandlerService.HandleTaskAsync(result, GetProducerAsync(id, result));
         }
 
         protected async Task<Result<Producer>> GetProducerAsync(int id, Result<Producer> result)
@@ -57,7 +59,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Producer>> AddProducerAsync(Producer producer)
         {
-            return _resultHandlerService.HandleTaskAsync(producer, AddProducerAsync);
+            var result = new Result<Producer>();
+            return _resultHandlerService.HandleTaskAsync(result, AddProducerAsync(producer, result));
         }
 
         protected async Task<Result<Producer>> AddProducerAsync(Producer request, Result<Producer> result)
@@ -94,7 +97,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Producer>> UpdateProducerAsync(Producer Producer)
         {
-            return _resultHandlerService.HandleTaskAsync(Producer, UpdateProducerAsync);
+            var result = new Result<Producer>();
+            return _resultHandlerService.HandleTaskAsync(result, UpdateProducerAsync(Producer, result));
         }
 
         public async Task<Result<Producer>> UpdateProducerAsync(Producer request, Result<Producer> result)
@@ -134,7 +138,8 @@ namespace Movies.Data.Services
 
         public Task<Result> DeleteProducerAsync(int id)
         {
-            return _resultHandlerService.HandleTaskAsync(id, DeleteProducerAsync);
+            var result = new Result();
+            return _resultHandlerService.HandleTaskAsync(result, DeleteProducerAsync(id, result));
         }
 
         public async Task<Result> DeleteProducerAsync(int id, Result result)

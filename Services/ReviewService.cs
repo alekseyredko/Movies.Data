@@ -48,7 +48,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Reviewer>> AddReviewerAsync(Reviewer reviewer)
         {
-            return _resultHandlerService.HandleTaskAsync(reviewer, AddReviewerAsync);
+            var result = new Result<Reviewer>();
+            return _resultHandlerService.HandleTaskAsync(result, AddReviewerAsync(reviewer, result));
         }
 
         protected async Task<Result<Reviewer>> AddReviewerAsync(Reviewer request, Result<Reviewer> result)
@@ -96,7 +97,8 @@ namespace Movies.Data.Services
 
         public Task<Result> DeleteReviewerAsync(int id)
         {
-            return _resultHandlerService.HandleTaskAsync(id, DeleteReviewerAsync);
+            var result = new Result();
+            return _resultHandlerService.HandleTaskAsync(result, DeleteReviewerAsync(id, result));
         }
 
         public async Task<Result> DeleteReviewerAsync(int id, Result result)
@@ -146,7 +148,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Reviewer>> GetReviewerAsync(int id)
         {
-            return _resultHandlerService.HandleTaskAsync<Reviewer, int>(id, GetReviewerAsyncResult);
+            var result = new Result<Reviewer>();
+            return _resultHandlerService.HandleTaskAsync(result, GetReviewerAsyncResult(id, result));
         }
 
         protected async Task<Result<Reviewer>> GetReviewerAsyncResult(int id, Result<Reviewer> result)
@@ -176,7 +179,8 @@ namespace Movies.Data.Services
 
         public Task<Result<IEnumerable<Reviewer>>> GetAllReviewersAsync()
         {
-            return _resultHandlerService.HandleTaskAsync<IEnumerable<Reviewer>>(GetReviewersAsync);
+            var result = new Result<IEnumerable<Reviewer>>();
+            return _resultHandlerService.HandleTaskAsync(result, GetReviewersAsync(result));
         }
 
         protected async Task<Result<IEnumerable<Reviewer>>> GetReviewersAsync(Result<IEnumerable<Reviewer>> result)
@@ -195,7 +199,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer reviewer)
         {
-            return _resultHandlerService.HandleTaskAsync(reviewer, UpdateReviewerAsync);
+            var result = new Result<Reviewer>();
+            return _resultHandlerService.HandleTaskAsync(result, UpdateReviewerAsync(reviewer, result));
         }
 
         public async Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer request, Result<Reviewer> result)

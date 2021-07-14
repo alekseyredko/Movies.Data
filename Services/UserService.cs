@@ -37,7 +37,8 @@ namespace Movies.Data.Services
 
         public Task<Result<User>> GetUserAccountAsync(int id)
         {
-            return _resultHandlerService.HandleTaskAsync<User, int>(id, GetUserAsync);
+            var result = new Result<User>();
+            return _resultHandlerService.HandleTaskAsync(result, GetUserAsync(id, result));
         }
 
         protected async Task<Result<User>> GetUserAsync(int id, Result<User> result)
@@ -58,7 +59,8 @@ namespace Movies.Data.Services
 
         public Task<Result<User>> RegisterAsync(User userRequest)
         {
-            return _resultHandlerService.HandleTaskAsync(userRequest, RegisterAsync);
+            var result = new Result<User>();
+            return _resultHandlerService.HandleTaskAsync(result, RegisterAsync(userRequest, result));
         }
 
         protected async Task<Result<User>> RegisterAsync(User userRequest, Result<User> result)
@@ -107,7 +109,8 @@ namespace Movies.Data.Services
 
         public Task<Result<User>> LoginAsync(User request)
         {
-            return _resultHandlerService.HandleTaskAsync(request, LoginAsync);
+            var result = new Result<User>();
+            return _resultHandlerService.HandleTaskAsync(result, LoginAsync(request, result));
         }
 
         protected async Task<Result<User>> LoginAsync(User request, Result<User> result)
@@ -137,7 +140,8 @@ namespace Movies.Data.Services
 
         public Task<Result<User>> UpdateAccountAsync(User request)
         {
-            return _resultHandlerService.HandleTaskAsync(request, UpdateAccountAsync);
+            var result = new Result<User>();
+            return _resultHandlerService.HandleTaskAsync(result, UpdateAccountAsync(request, result));
         }
 
         protected async Task<Result<User>> UpdateAccountAsync(User request, Result<User> result)
@@ -225,7 +229,8 @@ namespace Movies.Data.Services
 
         public Task<Result> DeleteAccountAsync(int id)
         {
-            return _resultHandlerService.HandleTaskAsync(id, DeleteAccountAsync);
+            var result = new Result();
+            return _resultHandlerService.HandleTaskAsync(result, DeleteAccountAsync(id, result));
         }
 
         protected async Task<Result> DeleteAccountAsync(int id, Result result)

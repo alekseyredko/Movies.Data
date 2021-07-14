@@ -26,10 +26,11 @@ namespace Movies.Data.Services
         public Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie)
         {
             movie.ProducerId = producerId;
-            return _resultHandlerService.HandleTaskAsync(movie, AddMovieAsync);
+            var result = new Result<Movie>();
+            return _resultHandlerService.HandleTaskAsync(result, AddMovieAsync1(movie,result));
         }
 
-        protected async Task<Result<Movie>> AddMovieAsync(Movie request, Result<Movie> result)
+        protected async Task<Result<Movie>> AddMovieAsync1(Movie request, Result<Movie> result)
         {
             var getMovie = await _unitOfWork.Movies.GetMovieByNameAsync(request.MovieName);
 
@@ -48,7 +49,8 @@ namespace Movies.Data.Services
 
         public Task<Result> DeleteMovieAsync(int producerId, int movieId)
         {
-            return _resultHandlerService.HandleTaskAsync(producerId, movieId, DeleteMovieAsync);
+            var result = new Result();
+            return _resultHandlerService.HandleTaskAsync(result, DeleteMovieAsync(producerId, movieId, result));
         }
 
         public async Task<Result> DeleteMovieAsync(int producerId, int movieId, Result result)
@@ -79,7 +81,8 @@ namespace Movies.Data.Services
 
         public Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync()
         {
-            return _resultHandlerService.HandleTaskAsync<IEnumerable<Movie>>(GetMoviesAsync);
+            var result = new Result<IEnumerable<Movie>>();
+            return _resultHandlerService.HandleTaskAsync(result, GetMoviesAsync(result));
         }
 
         protected async Task<Result<IEnumerable<Movie>>> GetMoviesAsync(Result<IEnumerable<Movie>> result)
@@ -149,7 +152,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Movie>> GetMovieAsync(int id)
         {
-            return _resultHandlerService.HandleTaskAsync<Movie, int>(id, GetMovieAsync);
+            var result = new Result<Movie>();
+            return _resultHandlerService.HandleTaskAsync(result, GetMovieAsync(id, result));
         }
 
         protected async Task<Result<Movie>> GetMovieAsync(int id, Result<Movie> result)
@@ -168,7 +172,8 @@ namespace Movies.Data.Services
 
         public Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie movie)
         {
-            return _resultHandlerService.HandleTaskAsync(producerId, movieId, movie, UpdateMovieAsync);
+            var result = new Result<Movie>();
+            return _resultHandlerService.HandleTaskAsync(result, UpdateMovieAsync(producerId, movieId, movie, result));
         }
 
         protected async Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie request, Result<Movie> result)
