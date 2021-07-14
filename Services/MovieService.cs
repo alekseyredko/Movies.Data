@@ -25,12 +25,11 @@ namespace Movies.Data.Services
 
         public Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie)
         {
-            movie.ProducerId = producerId;
             var result = new Result<Movie>();
-            return _resultHandlerService.HandleTaskAsync(result, AddMovieAsync1(movie,result));
+            return _resultHandlerService.HandleTaskAsync(result, AddMovieAsync(producerId, movie,result));
         }
 
-        protected async Task<Result<Movie>> AddMovieAsync1(Movie request, Result<Movie> result)
+        protected async Task<Result<Movie>> AddMovieAsync(int producerId, Movie request, Result<Movie> result)
         {
             var getMovie = await _unitOfWork.Movies.GetMovieByNameAsync(request.MovieName);
 
@@ -39,6 +38,8 @@ namespace Movies.Data.Services
                 _resultHandlerService.SetExists(nameof(request.MovieName), result);
                 return result;
             }
+
+            request.ProducerId = producerId;
 
             await _unitOfWork.Movies.InsertAsync(request);
             await _unitOfWork.SaveAsync();
