@@ -12,21 +12,17 @@ namespace Movies.Data.Services
     {
         public async Task<Result<T>> HandleTaskAsync<T>(Result<T> result, Task<Result<T>> func)
         {
-            try
-            {
-                await func;
-            }
-            catch (Exception e)
-            {
-                //TODO: log exception
-                result.ResultType = ResultType.Unexpected;
-                result.Value = default(T);
-                result.Title = "Sorry, please try again later!";
-            }
+            await TryExecuteAsync(result, func);
             return result;
         }
 
         public async Task<Result> HandleTaskAsync(Result result, Task<Result> func)
+        {
+            await TryExecuteAsync(result, func);
+            return result;
+        }
+
+        private static async Task TryExecuteAsync(Result result, Task func)
         {
             try
             {
@@ -38,7 +34,6 @@ namespace Movies.Data.Services
                 result.ResultType = ResultType.Unexpected;
                 result.Title = "Sorry, please try again later!";
             }
-            return result;
         }
 
         public bool CheckStringPropsAreEqual<T>(string prop1, string prop2, string propName, Result<T> result)

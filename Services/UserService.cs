@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Mappers;
 using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
+using Movies.Data.Models.Validators;
 using Movies.Data.Results;
 using Movies.Data.Services.Interfaces;
 using MoviesDataLayer.Interfaces;
@@ -20,12 +23,11 @@ namespace Movies.Data.Services
     public class UserService: IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IResultHandlerService _resultHandlerService;
-
-        public UserService(IUnitOfWork unitOfWork, IResultHandlerService resultHandlerService)
+        private readonly IValidator<User> _userValidator;
+        public UserService(IUnitOfWork unitOfWork, IValidator<User> userValidator)
         {
             _unitOfWork = unitOfWork;
-            _resultHandlerService = resultHandlerService;
+            _userValidator = userValidator;
         }
 
         private (string, string) HashPasswordAndGetSalt(string password)
@@ -35,10 +37,11 @@ namespace Movies.Data.Services
             return (salt, hash);
         }
 
-        public Task<Result<User>> GetUserAccountAsync(int id)
+        public async Task<Result<User>> GetUserAccountAsync(int id)
         {
             var result = new Result<User>();
-            return _resultHandlerService.HandleTaskAsync(result, GetUserAsync(id, result));
+            await  ResultHandler.TryExecuteAsync(result, GetUserAsync(id, result));
+            return result;
         }
 
         protected async Task<Result<User>> GetUserAsync(int id, Result<User> result)
@@ -46,30 +49,41 @@ namespace Movies.Data.Services
             var user = await _unitOfWork.UserRepository.GetByIDAsync(id);
             if (user == null)
             {
-                _resultHandlerService.SetNotFound(nameof(user.UserId), result);
+                ResultHandler.SetNotFound(nameof(user.UserId), result);
                 return result;
             }
 
             user.Roles = await GetUserRolesAsync(id);
 
-            _resultHandlerService.SetOk(user, result);
+            ResultHandler.SetOk(user, result);
 
             return result;
         }
 
-        public Task<Result<User>> RegisterAsync(User userRequest)
+        public async Task<Result<User>> RegisterAsync(User userRequest)
         {
             var result = new Result<User>();
-            return _resultHandlerService.HandleTaskAsync(result, RegisterAsync(userRequest, result));
+            await ResultHandler.TryExecuteAsync(result, RegisterAsync(userRequest, result));
+            return result;
         }
 
         protected async Task<Result<User>> RegisterAsync(User userRequest, Result<User> result)
         {
+            var validationResult = await _userValidator.ValidateAsync(userRequest, options =>
+            {
+                options.IncludeAllRuleSets();
+            });
+            if (!validationResult.IsValid)
+            {
+                ResultHandler.AddInvalidProps(result, validationResult);
+                return result;
+            }
+
             var getUser = await _unitOfWork.UserRepository.GetByLoginAsync(userRequest.Login);
 
             if (getUser != null)
             {
-                _resultHandlerService.SetExists(nameof(getUser.Login), result);
+                ResultHandler.SetExists(nameof(getUser.Login), result);
                 return result;
             }
 
@@ -107,18 +121,29 @@ namespace Movies.Data.Services
             return result;
         }
 
-        public Task<Result<User>> LoginAsync(User request)
+        public async Task<Result<User>> LoginAsync(User request)
         {
             var result = new Result<User>();
-            return _resultHandlerService.HandleTaskAsync(result, LoginAsync(request, result));
+            await ResultHandler.TryExecuteAsync(result, LoginAsync(request, result));
+            return result;
         }
 
         protected async Task<Result<User>> LoginAsync(User request, Result<User> result)
         {
+            var validationResult = await _userValidator.ValidateAsync(request, options =>
+            {
+                options.IncludeRulesNotInRuleSet();
+            });
+            if (!validationResult.IsValid)
+            {
+                ResultHandler.AddInvalidProps(result, validationResult);
+                return result;
+            }
+
             var user = await _unitOfWork.UserRepository.GetByLoginAsync(request.Login);
             if (user == null)
             {
-                _resultHandlerService.SetNotFound(nameof(request.Login), result);
+                ResultHandler.SetNotFound(nameof(request.Login), result);
                 return result;
             }
 
@@ -138,18 +163,29 @@ namespace Movies.Data.Services
         }
 
 
-        public Task<Result<User>> UpdateAccountAsync(User request)
+        public async Task<Result<User>> UpdateAccountAsync(User request)
         {
             var result = new Result<User>();
-            return _resultHandlerService.HandleTaskAsync(result, UpdateAccountAsync(request, result));
+            await ResultHandler.TryExecuteAsync(result, UpdateAccountAsync(request, result));
+            return result;
         }
 
         protected async Task<Result<User>> UpdateAccountAsync(User request, Result<User> result)
         {
+            var validationResult = await _userValidator.ValidateAsync(request, options =>
+            {
+                options.IncludeAllRuleSets();
+            });
+            if (!validationResult.IsValid)
+            {
+                ResultHandler.AddInvalidProps(result, validationResult);
+                return result;
+            }
+
             var user = await _unitOfWork.UserRepository.GetByIDAsync(request.UserId);
             if (user == null)
             {
-                _resultHandlerService.SetAccountNotFound(nameof(request.Login), result);
+                ResultHandler.SetAccountNotFound(nameof(request.Login), result);
                 return result;
             }
 
@@ -165,7 +201,7 @@ namespace Movies.Data.Services
             if (request.Login != null)
             {
                 var loginsAreNotSame =
-                    _resultHandlerService.CheckStringPropsAreEqual(request.Login, user.Login, nameof(request.Login),
+                    ResultHandler.CheckStringPropsAreEqual(request.Login, user.Login, nameof(request.Login),
                         result);
 
                 if (loginsAreNotSame)
@@ -173,7 +209,7 @@ namespace Movies.Data.Services
                     var getAnother = await _unitOfWork.UserRepository.GetByLoginAsync(request.Login);
                     if (getAnother != null)
                     {
-                        _resultHandlerService.SetExists(nameof(request.Login), result);
+                        ResultHandler.SetExists(nameof(request.Login), result);
                     }
                     else
                     {
@@ -185,7 +221,7 @@ namespace Movies.Data.Services
             if (request.Name != null)
             {
                 var namesAreNotSame =
-                    _resultHandlerService.CheckStringPropsAreEqual(request.Name, person.PersonName, nameof(request.Name), 
+                    ResultHandler.CheckStringPropsAreEqual(request.Name, person.PersonName, nameof(request.Name), 
                         result);
 
                 if (namesAreNotSame)
@@ -222,15 +258,17 @@ namespace Movies.Data.Services
 
             await _unitOfWork.SaveAsync();
 
-            _resultHandlerService.SetOk(request, result);
+           
+            ResultHandler.SetOk(request, result);
 
             return result;
         }
 
-        public Task<Result> DeleteAccountAsync(int id)
+        public async Task<Result> DeleteAccountAsync(int id)
         {
             var result = new Result();
-            return _resultHandlerService.HandleTaskAsync(result, DeleteAccountAsync(id, result));
+            await ResultHandler.TryExecuteAsync(result, DeleteAccountAsync(id, result));
+            return result;
         }
 
         protected async Task<Result> DeleteAccountAsync(int id, Result result)
@@ -240,7 +278,7 @@ namespace Movies.Data.Services
 
             if (user == null || person == null)
             {
-                _resultHandlerService.SetAccountNotFound("Id", result);
+                ResultHandler.SetAccountNotFound("Id", result);
 
                 return result;
             }
@@ -257,6 +295,11 @@ namespace Movies.Data.Services
         {
             var roles = new List<UserRoles>();
             var person = await _unitOfWork.Persons.GetFullPersonAsync(id);
+
+            if (person == null)
+            {
+                return null;
+            }
 
             roles.Add(UserRoles.Person);
 
