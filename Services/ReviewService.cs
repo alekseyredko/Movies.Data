@@ -93,18 +93,25 @@ namespace Movies.Data.Services
                 return result;
             }
 
-            await _unitOfWork.Reviewers.DeleteAsync(id);
-
             reviewer = await _unitOfWork.Reviewers.GetFullReviewerAsync(id);
 
-            foreach (var reviewerMovie in reviewer.Movies)
+            foreach (var review in reviewer.Reviews)
             {
-                var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(reviewerMovie.MovieId);
-                movie.Reviews = movie.Reviews.Where(x => x.ReviewerId != reviewer.ReviewerId).ToList();
+                var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(review.MovieId);
 
-                RecalculateTotalMovieScore(movie);
-                _unitOfWork.Movies.Update(movie);
+                if (movie == null)
+                {
+                    break;
+                }
+                else
+                {
+                    movie.Reviews.Remove(review);
+                    RecalculateTotalMovieScore(movie);
+                    _unitOfWork.Movies.Update(movie);
+                }
             }
+
+            await _unitOfWork.Reviewers.DeleteAsync(id);
 
             await _unitOfWork.SaveAsync();
 
@@ -286,12 +293,15 @@ namespace Movies.Data.Services
                 return result;
             }
 
+            review.ReviewerId = reviewerId;
             getMovie.Reviews.Add(review);
 
             RecalculateTotalMovieScore(getMovie);
 
             _unitOfWork.Movies.Update(getMovie);
             await _unitOfWork.SaveAsync();
+
+            ResultHandler.SetOk(review, result);
 
             return result;
         }
@@ -340,13 +350,13 @@ namespace Movies.Data.Services
                 var reviewsTextAreNotSame = ResultHandler.CheckStringPropsAreEqual(review.ReviewText, getReview.ReviewText,
                     nameof(review.ReviewText), result);
 
-                if (!reviewsTextAreNotSame)
+                if (reviewsTextAreNotSame)
                 {
                     getReview.ReviewText = review.ReviewText;
                 }
             }
-
-            var canChangeRate = review.Rate != 0 && getReview.Rate != review.Rate;
+            //TODO: set old and new rates are same
+            var canChangeRate = review.Rate != 0;
             if (canChangeRate)
             {
                 if (getReview.Rate == review.Rate)
@@ -354,11 +364,13 @@ namespace Movies.Data.Services
                     result.ResultType = ResultType.AlreadyExists;
                     result.Title = "Please check your input data";
                     result.AddError(nameof(review.Rate), "Old and new Rates are the same!");
+
+                    canChangeRate = false;
                 }
                 else
                 {
                     getReview.Rate = review.Rate;
-                    //TODO: recalculate movie rate
+                    
                 }
             }
 
@@ -390,7 +402,7 @@ namespace Movies.Data.Services
 
         public async Task<Result> DeleteReviewAsync(int reviewerId, int reviewId, Result result)
         {
-            var getReviewer = await _unitOfWork.Reviewers.GetByIDAsync(reviewId);
+            var getReviewer = await _unitOfWork.Reviewers.GetByIDAsync(reviewerId);
             if (getReviewer == null)
             {
                 ResultHandler.SetAccountNotFound(nameof(getReviewer.ReviewerId), result);
