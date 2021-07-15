@@ -419,7 +419,6 @@ namespace Movies.Data.Services
                 return result;
             }
 
-
             
             getMovie.Reviews.Remove(getReview);
             RecalculateTotalMovieScore(getMovie);
