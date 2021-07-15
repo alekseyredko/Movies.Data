@@ -355,7 +355,7 @@ namespace Movies.Data.Services
                     getReview.ReviewText = review.ReviewText;
                 }
             }
-            //TODO: set old and new rates are same
+            
             var canChangeRate = review.Rate != 0;
             if (canChangeRate)
             {
