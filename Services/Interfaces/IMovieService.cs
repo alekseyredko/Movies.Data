@@ -9,7 +9,6 @@ namespace Movies.Data.Services.Interfaces
     {
         Task AddActorToMovieAsync(int movieId, int actorId);
         Task DeleteActorFromMovieAsync(int movieId, int actorId);
-        Task<Result<Movie>> GetMovieAsync(int id);
         Task<IEnumerable<Actor>> GetMovieActorsAsync(int movieId);
         Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync();
         Task<IEnumerable<Movie>> GetAllMoviesWithInfoAsync();
@@ -17,6 +16,7 @@ namespace Movies.Data.Services.Interfaces
    
 
         Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie);
+        Task<Result<Movie>> GetMovieAsync(int id);
         Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie movie);
         Task<Result> DeleteMovieAsync(int producerId, int movieId);
     }

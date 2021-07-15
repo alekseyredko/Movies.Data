@@ -58,7 +58,13 @@ namespace Movies.Data.DataAccess.Repositiories
 
         public async Task<Reviewer> GetReviewerWithReviewsAsync(int reviewerId)
         {
-            var reviewer = await context.Reviewers.FindAsync(reviewerId);           
+            var reviewer = await context.Reviewers.FindAsync(reviewerId);
+
+            if (reviewer == null)
+            {
+                return null;
+            }
+
             await context.Entry(reviewer).Collection(x => x.Reviews).LoadAsync();
 
             return reviewer;

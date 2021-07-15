@@ -188,9 +188,11 @@ namespace Movies.Data.DataAccess
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getutcdate())");
 
-                entity.Property(e => e.Rate).HasDefaultValueSql("((5))");
+                entity.Property(e => e.Rate)
+                    .IsRequired()
+                    .HasDefaultValueSql("((5))");
 
-                entity.Property(e => e.RevievText)
+                entity.Property(e => e.ReviewText)
                     .IsRequired()
                     .HasMaxLength(1024)
                     .IsUnicode(false);

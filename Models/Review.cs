@@ -8,8 +8,8 @@ namespace Movies.Data.Models
     public partial class Review
     {
         public int ReviewId { get; set; }
-        public string RevievText { get; set; }
-        public double? Rate { get; set; }
+        public string ReviewText { get; set; }
+        public int Rate { get; set; }
         public int MovieId { get; set; }
         public int ReviewerId { get; set; }
         public DateTime? LastUpdate { get; set; }

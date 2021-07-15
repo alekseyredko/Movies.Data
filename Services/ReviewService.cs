@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper.Configuration.Conventions;
+using Castle.Core.Internal;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Movies.Data.Results;
@@ -76,25 +77,6 @@ namespace Movies.Data.Services
             return result;
         }
 
-        public async Task DeleteReviewAsync(int id)
-        {
-            var review = await _unitOfWork.Reviews.GetReviewWithMovie(id);
-            if (review == null)
-            {
-                throw new InvalidOperationException($"No such review with id: {id}");
-            }
-
-            var movie = await _unitOfWork.Movies.GetMovieWithReviewsAsync(review.MovieId);
-
-            await _unitOfWork.Reviews.DeleteAsync(id);
-            movie.Reviews.Remove(review);
-
-            RecalculateTotalMovieScore(movie);
-
-            _unitOfWork.Movies.Update(movie);           
-            await _unitOfWork.SaveAsync();
-        }
-
         public async Task<Result> DeleteReviewerAsync(int id)
         {
             var result = new Result();
@@ -134,17 +116,6 @@ namespace Movies.Data.Services
         protected void RecalculateTotalMovieScore(Movie movie)
         {            
             movie.Rate = movie.Reviews.Sum(x => x.Rate);
-        }
-
-        public async Task<Review> GetReviewAsync(int id)
-        {
-            var review = await _unitOfWork.Reviews.GetByIDAsync(id);
-            if (review == null)
-            {
-                throw new InvalidOperationException($"Review not found in database with id: {id}");
-            }
-
-            return review;
         }
 
         public async Task<Result<Reviewer>> GetReviewerAsync(int id)
@@ -245,10 +216,221 @@ namespace Movies.Data.Services
             return result;
         }
 
-        public async Task UpdateReviewAsync(Review review)
+        public async Task<Result<IEnumerable<Review>>> GetAllReviewsAsync()
         {
-            _unitOfWork.Reviews.Update(review);
+            var result = new Result<IEnumerable<Review>>();
+            await ResultHandler.TryExecuteAsync(result, GetAllReviewsAsync(result));
+            return result;
+        }
+
+        protected async Task<Result<IEnumerable<Review>>> GetAllReviewsAsync(Result<IEnumerable<Review>> result)
+        {
+            var reviews = await _unitOfWork.Reviews.GetAllAsync();
+
+            ResultHandler.SetOk(reviews, result);
+
+            return result;
+        }
+
+        public async Task<Result<Review>> GetReviewAsync(int id)
+        {
+            var result = new Result<Review>();
+
+            await ResultHandler.TryExecuteAsync(result, GetReviewAsync(id, result));
+            return result;
+        }
+
+        public async Task<Result<Review>> GetReviewAsync(int id, Result<Review> result)
+        {
+            var review = await _unitOfWork.Reviews.GetByIDAsync(id);
+
+            if (review == null)
+            {
+                ResultHandler.SetNotFound(nameof(review.ReviewId), result);
+                return result;
+            }
+
+            ResultHandler.SetOk(review, result);
+
+            return result;
+        }
+
+        public async Task<Result<Review>> AddReviewAsync(int movieId, int reviewerId, Review review)
+        {
+            var result = new Result<Review>();
+
+            await ResultHandler.TryExecuteAsync(result, AddReviewAsync(movieId, reviewerId, review, result));
+            return result;
+        }
+
+        protected async Task<Result<Review>> AddReviewAsync(int movieId, int reviewerId, Review review, Result<Review> result)
+        {
+            var getReviewer = await _unitOfWork.Reviewers.GetReviewerWithReviewsAsync(reviewerId);
+            if (getReviewer == null)
+            {
+                ResultHandler.SetAccountNotFound(nameof(getReviewer.ReviewerId), result);
+                return result;
+            }
+
+            var getMovie = await _unitOfWork.Movies.GetByIDAsync(movieId);
+            if (getMovie == null)
+            {
+                ResultHandler.SetNotFound(nameof(getMovie.MovieId), result);
+                return result;
+            }
+
+            var getReview = getReviewer.Reviews.FirstOrDefault(x => x.MovieId == movieId);
+            if (getReview != null)
+            {
+                ResultHandler.SetExists(nameof(getReview.ReviewerId), result);
+                return result;
+            }
+
+            getMovie.Reviews.Add(review);
+
+            RecalculateTotalMovieScore(getMovie);
+
+            _unitOfWork.Movies.Update(getMovie);
             await _unitOfWork.SaveAsync();
+
+            return result;
+        }
+
+
+        public async Task<Result<Review>> UpdateReviewAsync(int reviewId, int reviewerId, Review review)
+        {
+            var result = new Result<Review>();
+            await ResultHandler.TryExecuteAsync(result, UpdateReviewAsync(reviewId, reviewerId, review, result));
+            return result;
+        }
+
+        protected async Task<Result<Review>> UpdateReviewAsync(int reviewId, int reviewerId, Review review, Result<Review> result)
+        {
+            var getReviewer = await _unitOfWork.Reviewers.GetReviewerWithReviewsAsync(reviewerId);
+            if (getReviewer == null)
+            {
+                ResultHandler.SetAccountNotFound(nameof(getReviewer.ReviewerId), result);
+                return result;
+            }
+
+            var getReview = await _unitOfWork.Reviews.GetByIDAsync(reviewId);
+            if (getReview == null)
+            {
+                ResultHandler.SetNotFound(nameof(getReview.ReviewerId), result);
+                return result;
+            }
+
+            var getMovie = await _unitOfWork.Movies.GetByIDAsync(getReview.MovieId);
+            if (getMovie == null)
+            {
+                ResultHandler.SetNotFound(nameof(getMovie.MovieId), result);
+                return result;
+            }
+
+            if (getReview.ReviewerId != reviewerId)
+            {
+                result.ResultType = ResultType.Forbidden;
+                result.Title = "Cannot update review from another reviewer";
+                result.AddError(nameof(getReview.ReviewerId), "Cannot update review from another reviewer");
+                return result;
+            }
+
+            if (!review.ReviewText.IsNullOrEmpty())
+            {
+                var reviewsTextAreNotSame = ResultHandler.CheckStringPropsAreEqual(review.ReviewText, getReview.ReviewText,
+                    nameof(review.ReviewText), result);
+
+                if (!reviewsTextAreNotSame)
+                {
+                    getReview.ReviewText = review.ReviewText;
+                }
+            }
+
+            var canChangeRate = review.Rate != 0 && getReview.Rate != review.Rate;
+            if (canChangeRate)
+            {
+                if (getReview.Rate == review.Rate)
+                {
+                    result.ResultType = ResultType.AlreadyExists;
+                    result.Title = "Please check your input data";
+                    result.AddError(nameof(review.Rate), "Old and new Rates are the same!");
+                }
+                else
+                {
+                    getReview.Rate = review.Rate;
+                    //TODO: recalculate movie rate
+                }
+            }
+
+            if (result.ResultType != ResultType.Ok)
+            {
+                return result;
+            }
+
+            if (canChangeRate)
+            {
+                RecalculateTotalMovieScore(getMovie);
+            }
+
+            _unitOfWork.Reviews.Update(getReview);
+            _unitOfWork.Movies.Update(getMovie);
+            await _unitOfWork.SaveAsync();
+
+            ResultHandler.SetOk(getReview, result);
+
+            return result;
+        }
+
+        public async Task<Result> DeleteReviewAsync(int reviewerId, int reviewId)
+        {
+            var result = new Result();
+            await ResultHandler.TryExecuteAsync(result, DeleteReviewAsync(reviewerId, reviewId, result));
+            return result;
+        }
+
+        public async Task<Result> DeleteReviewAsync(int reviewerId, int reviewId, Result result)
+        {
+            var getReviewer = await _unitOfWork.Reviewers.GetByIDAsync(reviewId);
+            if (getReviewer == null)
+            {
+                ResultHandler.SetAccountNotFound(nameof(getReviewer.ReviewerId), result);
+                return result;
+            }
+
+            var getReview = await _unitOfWork.Reviews.GetByIDAsync(reviewId);
+            if (getReview == null)
+            {
+                ResultHandler.SetNotFound(nameof(getReview.ReviewId), typeof(Review), result);
+                return result;
+            }
+
+            if (getReview.ReviewerId != reviewerId)
+            {
+                result.ResultType = ResultType.Forbidden;
+                result.Title = "Cannot delete review from another reviewer";
+                result.AddError(nameof(getReview.ReviewerId), "Cannot delete review from another reviewer");
+                return result;
+            }
+
+            var getMovie = await _unitOfWork.Movies.GetByIDAsync(getReview.MovieId);
+            if (getMovie == null)
+            {
+                ResultHandler.SetNotFound(nameof(getMovie.MovieId), typeof(Movie), result);
+                return result;
+            }
+
+
+            
+            getMovie.Reviews.Remove(getReview);
+            RecalculateTotalMovieScore(getMovie);
+
+            await _unitOfWork.Reviews.DeleteAsync(reviewId);
+            _unitOfWork.Movies.Update(getMovie);
+            await _unitOfWork.SaveAsync();
+
+            ResultHandler.SetOk(result);
+
+            return result;
         }
     }
 }
