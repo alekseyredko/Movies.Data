@@ -16,17 +16,16 @@ namespace Movies.Data.Services
     public class MovieService : IMovieService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IResultHandlerService _resultHandlerService;
-        public MovieService(IUnitOfWork unitOfWork, IResultHandlerService resultHandlerService)
+        public MovieService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _resultHandlerService = resultHandlerService;
         }
 
-        public Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie)
+        public async Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie)
         {
             var result = new Result<Movie>();
-            return _resultHandlerService.HandleTaskAsync(result, AddMovieAsync(producerId, movie,result));
+            await ResultHandler.TryExecuteAsync(result, AddMovieAsync(producerId, movie,result));
+            return result;
         }
 
         protected async Task<Result<Movie>> AddMovieAsync(int producerId, Movie request, Result<Movie> result)
@@ -35,7 +34,7 @@ namespace Movies.Data.Services
 
             if (getMovie!=null)
             {
-                _resultHandlerService.SetExists(nameof(request.MovieName), result);
+                ResultHandler.SetExists(nameof(request.MovieName), result);
                 return result;
             }
 
@@ -44,14 +43,15 @@ namespace Movies.Data.Services
             await _unitOfWork.Movies.InsertAsync(request);
             await _unitOfWork.SaveAsync();
 
-            _resultHandlerService.SetOk(request, result);
+            ResultHandler.SetOk(request, result);
             return result;
         }
 
-        public Task<Result> DeleteMovieAsync(int producerId, int movieId)
+        public async Task<Result> DeleteMovieAsync(int producerId, int movieId)
         {
             var result = new Result();
-            return _resultHandlerService.HandleTaskAsync(result, DeleteMovieAsync(producerId, movieId, result));
+            await ResultHandler.TryExecuteAsync(result, DeleteMovieAsync(producerId, movieId, result));
+            return result;
         }
 
         public async Task<Result> DeleteMovieAsync(int producerId, int movieId, Result result)
@@ -60,7 +60,7 @@ namespace Movies.Data.Services
 
             if (getMovie == null)
             {
-                _resultHandlerService.SetNotFound("MovieId", typeof(Movie), result);
+                ResultHandler.SetNotFound("MovieId", typeof(Movie), result);
                 return result;
             }
 
@@ -75,22 +75,23 @@ namespace Movies.Data.Services
             await _unitOfWork.Movies.DeleteAsync(movieId);
             await _unitOfWork.SaveAsync();
 
-            _resultHandlerService.SetOk(result);
+            ResultHandler.SetOk(result);
 
             return result;
         }
 
-        public Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync()
+        public async Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync()
         {
             var result = new Result<IEnumerable<Movie>>();
-            return _resultHandlerService.HandleTaskAsync(result, GetMoviesAsync(result));
+            await ResultHandler.TryExecuteAsync(result, GetMoviesAsync(result));
+            return result;
         }
 
         protected async Task<Result<IEnumerable<Movie>>> GetMoviesAsync(Result<IEnumerable<Movie>> result)
         {
             var movies = await _unitOfWork.Movies.GetAllAsync();
 
-            _resultHandlerService.SetOk(movies, result);
+            ResultHandler.SetOk(movies, result);
 
             return result;
         }
@@ -151,10 +152,11 @@ namespace Movies.Data.Services
             return movie.Actors;
         }
 
-        public Task<Result<Movie>> GetMovieAsync(int id)
+        public async Task<Result<Movie>> GetMovieAsync(int id)
         {
             var result = new Result<Movie>();
-            return _resultHandlerService.HandleTaskAsync(result, GetMovieAsync(id, result));
+            await ResultHandler.TryExecuteAsync(result, GetMovieAsync(id, result));
+            return result;
         }
 
         protected async Task<Result<Movie>> GetMovieAsync(int id, Result<Movie> result)
@@ -162,19 +164,20 @@ namespace Movies.Data.Services
             var movie = await _unitOfWork.Movies.GetByIDAsync(id);
             if (movie == null)
             {
-                _resultHandlerService.SetNotFound(nameof(movie.MovieId), result);
+                ResultHandler.SetNotFound(nameof(movie.MovieId), result);
                 return result;
             }
 
-            _resultHandlerService.SetOk(movie, result);
+            ResultHandler.SetOk(movie, result);
 
             return result;
         }
 
-        public Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie movie)
+        public async Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie movie)
         {
             var result = new Result<Movie>();
-            return _resultHandlerService.HandleTaskAsync(result, UpdateMovieAsync(producerId, movieId, movie, result));
+            await ResultHandler.TryExecuteAsync(result, UpdateMovieAsync(producerId, movieId, movie, result));
+            return result;
         }
 
         protected async Task<Result<Movie>> UpdateMovieAsync(int producerId, int movieId, Movie request, Result<Movie> result)
@@ -183,7 +186,7 @@ namespace Movies.Data.Services
 
             if (getMovie == null)
             {
-                _resultHandlerService.SetNotFound(nameof(request.MovieId), result);
+                ResultHandler.SetNotFound(nameof(request.MovieId), result);
                 return result;
             }
 
@@ -195,7 +198,7 @@ namespace Movies.Data.Services
                 return result;
             }
 
-            var namesAreNotSame = _resultHandlerService.CheckStringPropsAreEqual(request.MovieName,
+            var namesAreNotSame = ResultHandler.CheckStringPropsAreEqual(request.MovieName,
                 getMovie.MovieName, nameof(request.MovieName), result);
 
             if (namesAreNotSame)
@@ -204,7 +207,7 @@ namespace Movies.Data.Services
 
                 if (anotherMovie != null)
                 {
-                    _resultHandlerService.SetExists(nameof(request.MovieName), result);
+                    ResultHandler.SetExists(nameof(request.MovieName), result);
                 }
                 else
                 {
@@ -219,7 +222,7 @@ namespace Movies.Data.Services
                 return result;
             }
 
-            _resultHandlerService.SetOk(getMovie, result);
+            ResultHandler.SetOk(getMovie, result);
 
             _unitOfWork.Movies.Update(getMovie);
             await _unitOfWork.SaveAsync();

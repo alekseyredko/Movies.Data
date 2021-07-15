@@ -17,11 +17,10 @@ namespace Movies.Data.Services
     public class ReviewService : IReviewService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IResultHandlerService _resultHandlerService;
-        public ReviewService(IUnitOfWork unitOfWork, IResultHandlerService resultHandlerService)
+  
+        public ReviewService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _resultHandlerService = resultHandlerService;
         }
 
         public async Task AddReviewAsync(Review review, int movieId)
@@ -46,10 +45,11 @@ namespace Movies.Data.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public Task<Result<Reviewer>> AddReviewerAsync(Reviewer reviewer)
+        public async Task<Result<Reviewer>> AddReviewerAsync(Reviewer reviewer)
         {
             var result = new Result<Reviewer>();
-            return _resultHandlerService.HandleTaskAsync(result, AddReviewerAsync(reviewer, result));
+            await ResultHandler.TryExecuteAsync(result, AddReviewerAsync(reviewer, result));
+            return result;
         }
 
         protected async Task<Result<Reviewer>> AddReviewerAsync(Reviewer request, Result<Reviewer> result)
@@ -58,7 +58,7 @@ namespace Movies.Data.Services
 
             if (reviewer != null)
             {
-                _resultHandlerService.SetExists(nameof(request.ReviewerId), result);
+                ResultHandler.SetExists(nameof(request.ReviewerId), result);
             }
 
             if (result.ResultType != ResultType.Ok)
@@ -95,10 +95,11 @@ namespace Movies.Data.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public Task<Result> DeleteReviewerAsync(int id)
+        public async Task<Result> DeleteReviewerAsync(int id)
         {
             var result = new Result();
-            return _resultHandlerService.HandleTaskAsync(result, DeleteReviewerAsync(id, result));
+            await ResultHandler.TryExecuteAsync(result, DeleteReviewerAsync(id, result));
+            return result;
         }
 
         public async Task<Result> DeleteReviewerAsync(int id, Result result)
@@ -106,7 +107,7 @@ namespace Movies.Data.Services
             var reviewer = await _unitOfWork.Reviewers.GetByIDAsync(id);
             if (reviewer == null)
             {
-                _resultHandlerService.SetAccountNotFound("Id", result);
+                ResultHandler.SetAccountNotFound("Id", result);
                 return result;
             }
 
@@ -125,7 +126,7 @@ namespace Movies.Data.Services
 
             await _unitOfWork.SaveAsync();
 
-            _resultHandlerService.SetOk(result);
+            ResultHandler.SetOk(result);
 
             return result;
         }
@@ -146,10 +147,11 @@ namespace Movies.Data.Services
             return review;
         }
 
-        public Task<Result<Reviewer>> GetReviewerAsync(int id)
+        public async Task<Result<Reviewer>> GetReviewerAsync(int id)
         {
             var result = new Result<Reviewer>();
-            return _resultHandlerService.HandleTaskAsync(result, GetReviewerAsyncResult(id, result));
+            await ResultHandler.TryExecuteAsync(result, GetReviewerAsyncResult(id, result));
+            return result;
         }
 
         protected async Task<Result<Reviewer>> GetReviewerAsyncResult(int id, Result<Reviewer> result)
@@ -157,11 +159,11 @@ namespace Movies.Data.Services
             var reviewer = await _unitOfWork.Reviewers.GetByIDAsync(id);
             if (reviewer == null)
             {
-                _resultHandlerService.SetNotFound(nameof(reviewer.ReviewerId), result);
+                ResultHandler.SetNotFound(nameof(reviewer.ReviewerId), result);
                 return result;
             }
 
-            _resultHandlerService.SetOk(reviewer, result);
+            ResultHandler.SetOk(reviewer, result);
 
             return result;
         }
@@ -177,30 +179,27 @@ namespace Movies.Data.Services
             return reviewer;
         }
 
-        public Task<Result<IEnumerable<Reviewer>>> GetAllReviewersAsync()
+        public async Task<Result<IEnumerable<Reviewer>>> GetAllReviewersAsync()
         {
             var result = new Result<IEnumerable<Reviewer>>();
-            return _resultHandlerService.HandleTaskAsync(result, GetReviewersAsync(result));
+            await ResultHandler.TryExecuteAsync(result, GetReviewersAsync(result));
+            return result;
         }
 
         protected async Task<Result<IEnumerable<Reviewer>>> GetReviewersAsync(Result<IEnumerable<Reviewer>> result)
         {
             var reviewers = await _unitOfWork.Reviewers.GetAllAsync();
 
-            _resultHandlerService.SetOk(reviewers, result);
+            ResultHandler.SetOk(reviewers, result);
 
             return result;
         }
 
-        public Task<IEnumerable<Review>> GetAllReviewsAsync()
-        {
-            return _unitOfWork.Reviews.GetAllAsync();
-        }
-
-        public Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer reviewer)
+        public async Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer reviewer)
         {
             var result = new Result<Reviewer>();
-            return _resultHandlerService.HandleTaskAsync(result, UpdateReviewerAsync(reviewer, result));
+            await ResultHandler.TryExecuteAsync(result, UpdateReviewerAsync(reviewer, result));
+            return result;
         }
 
         public async Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer request, Result<Reviewer> result)
@@ -209,13 +208,13 @@ namespace Movies.Data.Services
 
             if (getReviewer == null)
             {
-                _resultHandlerService.SetNotFound(nameof(request.ReviewerId), result);
+                ResultHandler.SetNotFound(nameof(request.ReviewerId), result);
                 return result;
             }
 
             if (request.NickName != null)
             {
-                var nickNameAreNotSame = _resultHandlerService.CheckStringPropsAreEqual(request.NickName,
+                var nickNameAreNotSame = ResultHandler.CheckStringPropsAreEqual(request.NickName,
                     getReviewer.NickName, nameof(request.NickName), result);
 
                 if (nickNameAreNotSame)
@@ -224,7 +223,7 @@ namespace Movies.Data.Services
 
                     if (getAnother != null)
                     {
-                        _resultHandlerService.SetExists(nameof(request.NickName), result);
+                        ResultHandler.SetExists(nameof(request.NickName), result);
                     }
                     else
                     {
@@ -238,7 +237,7 @@ namespace Movies.Data.Services
                 return result;
             }
             
-            _resultHandlerService.SetOk(getReviewer, result);
+            ResultHandler.SetOk(getReviewer, result);
 
             _unitOfWork.Reviewers.Update(getReviewer);
             await _unitOfWork.SaveAsync();

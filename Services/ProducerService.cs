@@ -14,33 +14,33 @@ namespace Movies.Data.Services
     public class ProducerService: IProducerService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IResultHandlerService _resultHandlerService;
 
-        public ProducerService(IUnitOfWork unitOfWork, IResultHandlerService resultHandlerService)
+        public ProducerService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _resultHandlerService = resultHandlerService;
         }
 
-        public Task<Result<IEnumerable<Producer>>> GetAllProducersAsync()
+        public async Task<Result<IEnumerable<Producer>>> GetAllProducersAsync()
         {
             var result = new Result<IEnumerable<Producer>>();
-            return _resultHandlerService.HandleTaskAsync(result, GetAllProducersAsync(result));
+            await ResultHandler.TryExecuteAsync(result, GetAllProducersAsync(result));
+            return result;
         }
 
         protected async Task<Result<IEnumerable<Producer>>> GetAllProducersAsync(Result<IEnumerable<Producer>> result)
         {
             var Producers = await _unitOfWork.Producers.GetAllAsync();
 
-            _resultHandlerService.SetOk(Producers, result);
+            ResultHandler.SetOk(Producers, result);
 
             return result;
         }
 
-        public Task<Result<Producer>> GetProducerAsync(int id)
+        public async Task<Result<Producer>> GetProducerAsync(int id)
         {
             var result = new Result<Producer>();
-            return _resultHandlerService.HandleTaskAsync(result, GetProducerAsync(id, result));
+            await ResultHandler.TryExecuteAsync(result, GetProducerAsync(id, result));
+            return result;
         }
 
         protected async Task<Result<Producer>> GetProducerAsync(int id, Result<Producer> result)
@@ -48,19 +48,20 @@ namespace Movies.Data.Services
             var Producer = await _unitOfWork.Producers.GetByIDAsync(id);
             if (Producer == null)
             {
-                _resultHandlerService.SetNotFound(nameof(Producer.ProducerId), result);
+                ResultHandler.SetNotFound(nameof(Producer.ProducerId), result);
                 return result;
             }
 
-            _resultHandlerService.SetOk(Producer, result);
+            ResultHandler.SetOk(Producer, result);
 
             return result;
         }
 
-        public Task<Result<Producer>> AddProducerAsync(Producer producer)
+        public async Task<Result<Producer>> AddProducerAsync(Producer producer)
         {
             var result = new Result<Producer>();
-            return _resultHandlerService.HandleTaskAsync(result, AddProducerAsync(producer, result));
+            await ResultHandler.TryExecuteAsync(result, AddProducerAsync(producer, result));
+            return result;
         }
 
         protected async Task<Result<Producer>> AddProducerAsync(Producer request, Result<Producer> result)
@@ -69,7 +70,7 @@ namespace Movies.Data.Services
 
             if (Producer != null)
             {
-                _resultHandlerService.SetExists(nameof(request.ProducerId), result);
+                ResultHandler.SetExists(nameof(request.ProducerId), result);
             }
 
             if (request.Country.IsNullOrEmpty())
@@ -95,10 +96,11 @@ namespace Movies.Data.Services
         }
 
 
-        public Task<Result<Producer>> UpdateProducerAsync(Producer Producer)
+        public async Task<Result<Producer>> UpdateProducerAsync(Producer Producer)
         {
             var result = new Result<Producer>();
-            return _resultHandlerService.HandleTaskAsync(result, UpdateProducerAsync(Producer, result));
+            await ResultHandler.TryExecuteAsync(result, UpdateProducerAsync(Producer, result));
+            return result;
         }
 
         public async Task<Result<Producer>> UpdateProducerAsync(Producer request, Result<Producer> result)
@@ -107,13 +109,13 @@ namespace Movies.Data.Services
 
             if (getProducer == null)
             {
-                _resultHandlerService.SetNotFound(nameof(request.ProducerId), result);
+                ResultHandler.SetNotFound(nameof(request.ProducerId), result);
                 return result;
             }
 
             if (request.Country != null)
             {
-                var countryAreNotSame = _resultHandlerService.CheckStringPropsAreEqual(request.Country,
+                var countryAreNotSame = ResultHandler.CheckStringPropsAreEqual(request.Country,
                     getProducer.Country, nameof(request.Country), result);
 
                 if (countryAreNotSame)
@@ -128,7 +130,7 @@ namespace Movies.Data.Services
                 return result;
             }
 
-            _resultHandlerService.SetOk(getProducer, result);
+            ResultHandler.SetOk(getProducer, result);
 
             _unitOfWork.Producers.Update(getProducer);
             await _unitOfWork.SaveAsync();
@@ -136,10 +138,11 @@ namespace Movies.Data.Services
             return result;
         }
 
-        public Task<Result> DeleteProducerAsync(int id)
+        public async Task<Result> DeleteProducerAsync(int id)
         {
             var result = new Result();
-            return _resultHandlerService.HandleTaskAsync(result, DeleteProducerAsync(id, result));
+            await ResultHandler.TryExecuteAsync(result, DeleteProducerAsync(id, result));
+            return result;
         }
 
         public async Task<Result> DeleteProducerAsync(int id, Result result)
@@ -147,7 +150,7 @@ namespace Movies.Data.Services
             var producer = await _unitOfWork.Producers.GetByIDAsync(id);
             if (producer == null)
             {
-                _resultHandlerService.SetAccountNotFound("Id", result);
+                ResultHandler.SetAccountNotFound("Id", result);
                 return result;
             }
 
@@ -155,7 +158,7 @@ namespace Movies.Data.Services
 
             await _unitOfWork.SaveAsync();
 
-            _resultHandlerService.SetOk(result);
+            ResultHandler.SetOk(result);
 
             return result;
         }
