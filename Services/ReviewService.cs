@@ -239,6 +239,38 @@ namespace Movies.Data.Services
             return result;
         }
 
+        public async Task<Result<IEnumerable<Review>>> GetMovieReviewsAsync(int movieId)
+        {
+            var result = new Result<IEnumerable<Review>>();
+            await ResultHandler.TryExecuteAsync(result, GetMovieReviewsAsync(movieId, result));
+            return result;
+        }
+
+        protected async Task<Result<IEnumerable<Review>>> GetMovieReviewsAsync(int movieId, Result<IEnumerable<Review>> result)
+        {            
+            var reviews = await _unitOfWork.Reviews.GetMovieReviewsAsync(movieId);
+
+            ResultHandler.SetOk(reviews, result);
+
+            return result;
+        }
+
+        public async Task<Result<IEnumerable<Review>>> GetReviewerReviewsAsync(int reviewerId)
+        {
+            var result = new Result<IEnumerable<Review>>();
+            await ResultHandler.TryExecuteAsync(result, GetReviewerReviewsAsync(reviewerId, result));
+            return result;
+        }
+
+        protected async Task<Result<IEnumerable<Review>>> GetReviewerReviewsAsync(int reviewerId, Result<IEnumerable<Review>> result)
+        {
+            var reviews = await _unitOfWork.Reviews.GetReviewerReviewsAsync(reviewerId);
+
+            ResultHandler.SetOk(reviews, result);
+
+            return result;
+        }
+
         public async Task<Result<Review>> GetReviewAsync(int id)
         {
             var result = new Result<Review>();

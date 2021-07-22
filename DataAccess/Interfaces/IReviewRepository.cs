@@ -14,5 +14,7 @@ namespace Movies.Data.DataAccess.Interfaces
         Task<Review> GetReviewWithReviewer(int reviewId);
         Task<Review> GetReviewWithAllAsync(int reviewId);
         Task<IEnumerable<Review>> GetReviewsWithAllAsync();
+        Task<IEnumerable<Review>> GetMovieReviewsAsync(int movieId);
+        Task<IEnumerable<Review>> GetReviewerReviewsAsync(int reviewerId);
     }
 }

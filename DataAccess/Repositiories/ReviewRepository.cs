@@ -25,6 +25,24 @@ namespace Movies.Data.DataAccess.Repositiories
             return reviews;
         }
 
+        public async Task<IEnumerable<Review>> GetMovieReviewsAsync(int movieId)
+        {
+            var reviews = await context.Reviews
+                .Where(x => x.MovieId == movieId)
+                .ToListAsync();
+
+            return reviews;
+        }
+
+        public async Task<IEnumerable<Review>> GetReviewerReviewsAsync(int reviewerId)
+        {
+            var reviews = await context.Reviews
+                .Where(x => x.ReviewerId == reviewerId)
+                .ToListAsync();
+
+            return reviews;
+        }
+
         public async Task<Review> GetReviewWithAllAsync(int reviewId)
         {            
             var review = await context.Reviews.SingleAsync(x => x.ReviewerId == reviewId);
