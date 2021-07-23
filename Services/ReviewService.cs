@@ -314,18 +314,19 @@ namespace Movies.Data.Services
             var getMovie = await _unitOfWork.Movies.GetByIDAsync(movieId);
             if (getMovie == null)
             {
-                ResultHandler.SetNotFound(nameof(getMovie.MovieId), result);
+                ResultHandler.SetNotFound("MovieId", typeof(Movie), result);
                 return result;
             }
 
             var getReview = getReviewer.Reviews.FirstOrDefault(x => x.MovieId == movieId);
             if (getReview != null)
             {
-                ResultHandler.SetExists(nameof(getReview.ReviewerId), result);
+                ResultHandler.SetExists("ReviewId", result);
                 return result;
             }
 
             review.ReviewerId = reviewerId;
+            review.MovieId = movieId;
             getMovie.Reviews.Add(review);
 
             RecalculateTotalMovieScore(getMovie);
