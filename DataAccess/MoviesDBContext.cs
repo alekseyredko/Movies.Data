@@ -10,10 +10,6 @@ namespace Movies.Data.DataAccess
 {
     public partial class MoviesDBContext : DbContext
     {
-        public MoviesDBContext()
-        {
-        }
-
         public MoviesDBContext(DbContextOptions<MoviesDBContext> options)
             : base(options)
         {
