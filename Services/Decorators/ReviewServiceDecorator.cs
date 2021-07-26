@@ -104,7 +104,7 @@ namespace Movies.Data.Services.Decorators
             using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
             {
                 var reviewService = new ReviewService(unitOfWork);
-                return await reviewService.UpdateReviewAsync(reviewerId, reviewId, review);
+                return await reviewService.UpdateReviewAsync(reviewId, reviewerId, review);
             }
         }
 
