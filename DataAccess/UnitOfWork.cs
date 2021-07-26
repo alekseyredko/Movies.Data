@@ -1,5 +1,7 @@
-﻿using Movies.Data.DataAccess;
+﻿using Microsoft.EntityFrameworkCore;
+using Movies.Data.DataAccess;
 using Movies.Data.DataAccess.Interfaces;
+using Movies.Data.DataAccess.Repositiories;
 using Movies.Data.Models;
 using MoviesDataLayer.Interfaces;
 using System;
@@ -13,6 +15,8 @@ namespace MoviesDataLayer
     public class UnitOfWork : IUnitOfWork
     {
         private MoviesDBContext _moviesDBContext;
+
+        private IDbContextFactory<MoviesDBContext> dbContextFactory;
 
         private readonly IActorRepository _actorRepository;
         private readonly IGenreRepository _genreRepository;
@@ -46,27 +50,27 @@ namespace MoviesDataLayer
         //    _moviesDBContext = moviesDBContext;
         //}
 
-        public UnitOfWork(IActorRepository actorRepository,
-            IGenreRepository genreRepository,
-            IMovieRepository movieRepository,
-            IPersonRepository personRepository,
-            IReviewRepository reviewRepository,
-            IReviewerRepository reviewerRepository,
-            IReviewerWatchHistoryRepository reviewerWatchHistoryRepository, 
-            MoviesDBContext moviesDBContext, IUserRepository userRepository, IProducerRepository producerRepository)
+        public UnitOfWork(IDbContextFactory<MoviesDBContext> dbContextFactory): this(dbContextFactory.CreateDbContext())
         {
-            _actorRepository = actorRepository;
-            _genreRepository = genreRepository;
-            _movieRepository = movieRepository;
-            _personRepository = personRepository;
-            _reviewRepository = reviewRepository;
-            _reviewerRepository = reviewerRepository;
-            _reviewerWatchHistoryRepository = reviewerWatchHistoryRepository;
-            _moviesDBContext = moviesDBContext;
-            _userRepository = userRepository;
-            _producerRepository = producerRepository;
+            
         }
 
+        public UnitOfWork(MoviesDBContext moviesDBContext)
+        {
+            _moviesDBContext = moviesDBContext;
+
+            _actorRepository = new ActorRepository(_moviesDBContext);
+            _genreRepository = new GenreRepository(_moviesDBContext);
+            _movieRepository = new MovieRepository(_moviesDBContext);
+            _personRepository = new PersonRepository(_moviesDBContext);
+            _reviewRepository = new ReviewRepository(_moviesDBContext);
+            _reviewerRepository = new ReviewerRepositoty(_moviesDBContext);
+            _reviewerWatchHistoryRepository = new ReviewerWatchHistoryRepository(_moviesDBContext);
+            _userRepository = new UserRepository(_moviesDBContext);
+            _producerRepository = new ProducerRepository(_moviesDBContext);
+
+        }
+        
         public void Dispose()
         {
             _moviesDBContext.Dispose();
