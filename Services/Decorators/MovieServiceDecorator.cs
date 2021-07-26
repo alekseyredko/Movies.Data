@@ -26,12 +26,12 @@ namespace Movies.Data.Services.Decorators
             throw new NotImplementedException();
         }
 
-        public Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie)
+        public async Task<Result<Movie>> AddMovieAsync(int producerId, Movie movie)
         {
             using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
             {
                 var movieSerice = new MovieService(unitOfWork);
-                return movieSerice.AddMovieAsync(producerId, movie);
+                return await movieSerice.AddMovieAsync(producerId, movie);
             }
         }
 
