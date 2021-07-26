@@ -27,15 +27,7 @@ namespace Movies.Data.Services
     {
         private IUnitOfWork _unitOfWork;
         private readonly IValidator<User> _userValidator;
-
-        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
-
-        public UserService(IDbContextFactory<MoviesDBContext> dbContextFactory, IValidator<User> userValidator)
-        {
-            this.dbContextFactory = dbContextFactory;
-            _userValidator = userValidator;
-        }
-
+        
         public UserService(IUnitOfWork unitOfWork, IValidator<User> userValidator)
         {
             _unitOfWork = unitOfWork;
@@ -52,10 +44,7 @@ namespace Movies.Data.Services
         public async Task<Result<User>> GetUserAccountAsync(int id)
         {
             var result = new Result<User>();
-            using (_unitOfWork = new UnitOfWork(dbContextFactory))
-            {
-                await ResultHandler.TryExecuteAsync(result, GetUserAsync(id, result));
-            }
+            await ResultHandler.TryExecuteAsync(result, GetUserAsync(id, result));
             return result;
         }
 

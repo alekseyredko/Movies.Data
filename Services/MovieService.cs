@@ -17,13 +17,7 @@ namespace Movies.Data.Services
 {
     public class MovieService : IMovieService
     {
-        private IUnitOfWork _unitOfWork;
-        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
-
-        public MovieService(IDbContextFactory<MoviesDBContext> dbContextFactory)
-        {
-            this.dbContextFactory = dbContextFactory;
-        }
+        private IUnitOfWork _unitOfWork;       
 
         public MovieService(IUnitOfWork unitOfWork)
         {
@@ -92,11 +86,8 @@ namespace Movies.Data.Services
         public async Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync()
         {
             var result = new Result<IEnumerable<Movie>>();
-            using (_unitOfWork = new UnitOfWork(dbContextFactory))
-            {
-                await ResultHandler.TryExecuteAsync(result, GetMoviesAsync(result));
-            }
-            
+            await ResultHandler.TryExecuteAsync(result, GetMoviesAsync(result));
+
             return result;
         }
 
@@ -169,10 +160,7 @@ namespace Movies.Data.Services
         {
             var result = new Result<Movie>();
 
-            using (_unitOfWork = new UnitOfWork(dbContextFactory))
-            {
-                await ResultHandler.TryExecuteAsync(result, GetMovieAsync(id, result));
-            }
+            await ResultHandler.TryExecuteAsync(result, GetMovieAsync(id, result));
 
             return result;
         }

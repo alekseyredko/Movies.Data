@@ -13,13 +13,7 @@ namespace Movies.Data.Services
     public class ActorsService : IActorsService
     {       
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
-
-        public ActorsService(IDbContextFactory<MoviesDBContext> dbContextFactory)
-        {
-            this.dbContextFactory = dbContextFactory;
-        }
-
+       
         public ActorsService(IUnitOfWork unitOfWork)
         {
             this._unitOfWork = unitOfWork;

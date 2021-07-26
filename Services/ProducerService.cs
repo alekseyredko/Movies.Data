@@ -15,14 +15,7 @@ namespace Movies.Data.Services
 {
     public class ProducerService: IProducerService
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
-
-        public ProducerService(IDbContextFactory<MoviesDBContext> dbContextFactory)
-        {
-            this.dbContextFactory = dbContextFactory;
-        }
+        private readonly IUnitOfWork _unitOfWork;       
 
         public ProducerService(IUnitOfWork unitOfWork)
         {
