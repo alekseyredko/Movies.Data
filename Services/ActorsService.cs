@@ -1,4 +1,6 @@
-﻿using Movies.Data.DataAccess.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Movies.Data.DataAccess;
+using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
 using Movies.Data.Services.Interfaces;
 using MoviesDataLayer.Interfaces;
@@ -11,6 +13,12 @@ namespace Movies.Data.Services
     public class ActorsService : IActorsService
     {       
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
+
+        public ActorsService(IDbContextFactory<MoviesDBContext> dbContextFactory)
+        {
+            this.dbContextFactory = dbContextFactory;
+        }
 
         public ActorsService(IUnitOfWork unitOfWork)
         {

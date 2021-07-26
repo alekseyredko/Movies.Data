@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
+using Microsoft.EntityFrameworkCore;
+using Movies.Data.DataAccess;
 using Movies.Data.Models;
 using Movies.Data.Results;
 using Movies.Data.Services.Interfaces;
@@ -14,6 +16,13 @@ namespace Movies.Data.Services
     public class ProducerService: IProducerService
     {
         private readonly IUnitOfWork _unitOfWork;
+
+        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
+
+        public ProducerService(IDbContextFactory<MoviesDBContext> dbContextFactory)
+        {
+            this.dbContextFactory = dbContextFactory;
+        }
 
         public ProducerService(IUnitOfWork unitOfWork)
         {

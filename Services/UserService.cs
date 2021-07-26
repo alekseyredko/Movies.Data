@@ -10,20 +10,32 @@ using AutoMapper.Mappers;
 using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Movies.Data.DataAccess;
 using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
 using Movies.Data.Models.Validators;
 using Movies.Data.Results;
 using Movies.Data.Services.Interfaces;
+using MoviesDataLayer;
 using MoviesDataLayer.Interfaces;
 
 namespace Movies.Data.Services
 {
     public class UserService: IUserService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private IUnitOfWork _unitOfWork;
         private readonly IValidator<User> _userValidator;
+
+        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
+
+        public UserService(IDbContextFactory<MoviesDBContext> dbContextFactory, IValidator<User> userValidator)
+        {
+            this.dbContextFactory = dbContextFactory;
+            _userValidator = userValidator;
+        }
+
         public UserService(IUnitOfWork unitOfWork, IValidator<User> userValidator)
         {
             _unitOfWork = unitOfWork;
@@ -40,7 +52,10 @@ namespace Movies.Data.Services
         public async Task<Result<User>> GetUserAccountAsync(int id)
         {
             var result = new Result<User>();
-            await  ResultHandler.TryExecuteAsync(result, GetUserAsync(id, result));
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, GetUserAsync(id, result));
+            }
             return result;
         }
 

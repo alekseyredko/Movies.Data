@@ -12,17 +12,27 @@ using Castle.Core.Internal;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Movies.Data.Results;
+using Movies.Data.DataAccess;
+using MoviesDataLayer;
 
 namespace Movies.Data.Services
 {
     public class ReviewService : IReviewService
     {
-        private readonly IUnitOfWork _unitOfWork;
-  
+        private IUnitOfWork _unitOfWork;
+
+        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
+
+        public ReviewService(IDbContextFactory<MoviesDBContext> dbContextFactory)
+        {
+            this.dbContextFactory = dbContextFactory;
+        }
+
         public ReviewService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+      
 
         public async Task AddReviewAsync(Review review, int movieId)
         {
@@ -226,7 +236,12 @@ namespace Movies.Data.Services
         public async Task<Result<IEnumerable<Review>>> GetAllReviewsAsync()
         {
             var result = new Result<IEnumerable<Review>>();
-            await ResultHandler.TryExecuteAsync(result, GetAllReviewsAsync(result));
+
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, GetAllReviewsAsync(result));
+            }
+
             return result;
         }
 
@@ -242,7 +257,12 @@ namespace Movies.Data.Services
         public async Task<Result<IEnumerable<Review>>> GetMovieReviewsAsync(int movieId)
         {
             var result = new Result<IEnumerable<Review>>();
-            await ResultHandler.TryExecuteAsync(result, GetMovieReviewsAsync(movieId, result));
+
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, GetMovieReviewsAsync(movieId, result));
+            }
+
             return result;
         }
 
@@ -275,7 +295,11 @@ namespace Movies.Data.Services
         {
             var result = new Result<Review>();
 
-            await ResultHandler.TryExecuteAsync(result, GetReviewAsync(id, result));
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, GetReviewAsync(id, result));
+            }
+            
             return result;
         }
 
@@ -298,23 +322,27 @@ namespace Movies.Data.Services
         {
             var result = new Result<Review>();
 
-            await ResultHandler.TryExecuteAsync(result, AddReviewAsync(movieId, reviewerId, review, result));
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, AddReviewAsync(movieId, reviewerId, review, result));
+            }
+            
             return result;
         }
 
         protected async Task<Result<Review>> AddReviewAsync(int movieId, int reviewerId, Review review, Result<Review> result)
-        {
-            var getReviewer = await _unitOfWork.Reviewers.GetReviewerWithReviewsAsync(reviewerId);
-            if (getReviewer == null)
-            {
-                ResultHandler.SetAccountNotFound(nameof(getReviewer.ReviewerId), result);
-                return result;
-            }
-
+        {           
             var getMovie = await _unitOfWork.Movies.GetByIDAsync(movieId);
             if (getMovie == null)
             {
                 ResultHandler.SetNotFound("MovieId", typeof(Movie), result);
+                return result;
+            }
+
+            var getReviewer = await _unitOfWork.Reviewers.GetReviewerWithReviewsAsync(reviewerId);
+            if (getReviewer == null)
+            {
+                ResultHandler.SetAccountNotFound(nameof(getReviewer.ReviewerId), result);
                 return result;
             }
 
@@ -339,11 +367,15 @@ namespace Movies.Data.Services
             return result;
         }
 
-
         public async Task<Result<Review>> UpdateReviewAsync(int reviewId, int reviewerId, Review review)
         {
             var result = new Result<Review>();
-            await ResultHandler.TryExecuteAsync(result, UpdateReviewAsync(reviewId, reviewerId, review, result));
+
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, UpdateReviewAsync(reviewId, reviewerId, review, result));
+            }
+
             return result;
         }
 

@@ -1,4 +1,6 @@
-﻿using Movies.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Movies.Data.DataAccess;
+using Movies.Data.Models;
 using Movies.Data.Services.Interfaces;
 using MoviesDataLayer.Interfaces;
 using System;
@@ -10,6 +12,12 @@ namespace Movies.Data.Services
     public class PersonService : IPersonService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
+
+        public PersonService(IDbContextFactory<MoviesDBContext> dbContextFactory)
+        {
+            this.dbContextFactory = dbContextFactory;
+        }
 
         public PersonService(IUnitOfWork unitOfWork)
         {

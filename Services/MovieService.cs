@@ -10,12 +10,21 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Movies.Data.Results;
+using Movies.Data.DataAccess;
+using MoviesDataLayer;
 
 namespace Movies.Data.Services
 {
     public class MovieService : IMovieService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private IUnitOfWork _unitOfWork;
+        private readonly IDbContextFactory<MoviesDBContext> dbContextFactory;
+
+        public MovieService(IDbContextFactory<MoviesDBContext> dbContextFactory)
+        {
+            this.dbContextFactory = dbContextFactory;
+        }
+
         public MovieService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -83,7 +92,11 @@ namespace Movies.Data.Services
         public async Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync()
         {
             var result = new Result<IEnumerable<Movie>>();
-            await ResultHandler.TryExecuteAsync(result, GetMoviesAsync(result));
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, GetMoviesAsync(result));
+            }
+            
             return result;
         }
 
@@ -155,7 +168,12 @@ namespace Movies.Data.Services
         public async Task<Result<Movie>> GetMovieAsync(int id)
         {
             var result = new Result<Movie>();
-            await ResultHandler.TryExecuteAsync(result, GetMovieAsync(id, result));
+
+            using (_unitOfWork = new UnitOfWork(dbContextFactory))
+            {
+                await ResultHandler.TryExecuteAsync(result, GetMovieAsync(id, result));
+            }
+
             return result;
         }
 
