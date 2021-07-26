@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Movies.Data.DataAccess;
+using MoviesDataLayer;
+using MoviesDataLayer.Interfaces;
 
 namespace Movies.Data.Results
 {
@@ -30,10 +34,15 @@ namespace Movies.Data.Results
             catch (Exception e)
             {
                 //TODO: log exception
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                if (e.InnerException!=null)
+                {
+                    System.Diagnostics.Debug.WriteLine(e.InnerException.Message);
+                }
                 result.ResultType = ResultType.Unexpected;
                 result.Title = "Sorry, please try again later!";
             }
-        }
+        }        
 
         public static bool CheckStringPropsAreEqual<T>(string prop1, string prop2, string propName, Result<T> result)
         {
