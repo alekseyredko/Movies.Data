@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>u</AssemblyName>
+    <AssemblyName>Movies.Data</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
