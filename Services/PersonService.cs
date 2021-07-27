@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Movies.Data.DataAccess;
+﻿using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
 using Movies.Data.Services.Interfaces;
-using MoviesDataLayer.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

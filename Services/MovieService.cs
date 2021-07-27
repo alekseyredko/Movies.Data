@@ -1,17 +1,11 @@
 ﻿using Movies.Data.Services.Interfaces;
-using MoviesDataLayer.Interfaces;
 using Movies.Data.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Movies.Data.Results;
-using Movies.Data.DataAccess;
-using MoviesDataLayer;
+using Movies.Data.DataAccess.Interfaces;
 
 namespace Movies.Data.Services
 {

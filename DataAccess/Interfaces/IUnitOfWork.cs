@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MoviesDataLayer.Interfaces
+namespace Movies.Data.DataAccess.Interfaces
 {
     public interface IUnitOfWork: IDisposable
     {

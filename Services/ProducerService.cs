@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
-using Microsoft.EntityFrameworkCore;
-using Movies.Data.DataAccess;
+using Movies.Data.DataAccess.Interfaces;
 using Movies.Data.Models;
 using Movies.Data.Results;
 using Movies.Data.Services.Interfaces;
-using MoviesDataLayer.Interfaces;
 
 namespace Movies.Data.Services
 {
