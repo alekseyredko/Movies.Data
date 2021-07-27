@@ -3,11 +3,8 @@ using Movies.Data.DataAccess;
 using Movies.Data.Models;
 using Movies.Data.Results;
 using Movies.Data.Services.Interfaces;
-using MoviesDataLayer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Movies.Data.Services.Decorators
@@ -50,7 +47,8 @@ namespace Movies.Data.Services.Decorators
             using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
             {
                 var movieSerice = new MovieService(unitOfWork);
-                return await movieSerice.GetAllMoviesAsync();
+                var task = movieSerice.GetAllMoviesAsync();
+                return await task;
             }
         }
 
