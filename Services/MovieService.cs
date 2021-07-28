@@ -94,6 +94,22 @@ namespace Movies.Data.Services
             return result;
         }
 
+        public async Task<Result<IEnumerable<Movie>>> GetMoviesByProducerIdAsync(int producerId)
+        {
+            var result = new Result<IEnumerable<Movie>>();
+            await ResultHandler.TryExecuteAsync(result, GetMoviesByProducerIdAsync(producerId, result));
+            return result;
+        }
+
+        protected async Task<Result<IEnumerable<Movie>>> GetMoviesByProducerIdAsync(int producerId, Result<IEnumerable<Movie>> result)
+        {
+            var movies = await _unitOfWork.Movies.GetMoviesByProducerIdAsync(producerId);
+
+            ResultHandler.SetOk(movies, result);
+
+            return result;
+        }
+
         public async Task DeleteActorFromMovieAsync(int movieId, int actorId)
         {
             var movie = await _unitOfWork.Movies.GetMovieWithActorsAsync(movieId);
@@ -239,6 +255,6 @@ namespace Movies.Data.Services
             }
 
             return movie;
-        }
+        }        
     }
 }

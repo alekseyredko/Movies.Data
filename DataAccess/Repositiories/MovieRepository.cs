@@ -95,5 +95,12 @@ namespace Movies.Data.DataAccess.Repositiories
         {
             return context.Movies.FirstOrDefaultAsync(x => x.MovieName.ToLower() == movieName.ToLower());
         }
+
+        public async Task<IEnumerable<Movie>> GetMoviesByProducerIdAsync(int producerId)
+        {
+            var movies = await context.Movies.Where(x => x.ProducerId == producerId).ToListAsync();
+
+            return movies;
+        }
     }
 }

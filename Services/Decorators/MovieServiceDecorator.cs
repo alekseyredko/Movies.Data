@@ -74,6 +74,15 @@ namespace Movies.Data.Services.Decorators
             }
         }
 
+        public async Task<Result<IEnumerable<Movie>>> GetMoviesByProducerIdAsync(int producerId)
+        {
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var movieSerice = new MovieService(unitOfWork);
+                return await movieSerice.GetMoviesByProducerIdAsync(producerId);
+            }
+        }
+
         public Task<Movie> GetMovieWithReviewsAsync(int id)
         {
             throw new NotImplementedException();

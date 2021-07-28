@@ -12,6 +12,7 @@ namespace Movies.Data.DataAccess.Interfaces
     public interface IMovieRepository: IGenericRepository<Movie>
     {
         Task<IEnumerable<Movie>> GetMoviesWithAllAsync();
+        Task<IEnumerable<Movie>> GetMoviesByProducerIdAsync(int producerId);
         Task<IEnumerable<Movie>> GetMoviesWithActorsAsync();        
         Task<Movie> GetMovieWithActorsAsync(int movieId);
         Task<Movie> GetMovieWithAllAsync(int movieId);
