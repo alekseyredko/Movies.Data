@@ -71,7 +71,11 @@ namespace Movies.Data.Services.Decorators
 
         public async Task<Result<User>> UpdateAccountAsync(User request)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var service = new UserService(unitOfWork, userValidator);
+                return await service.UpdateAccountAsync(request);
+            }
         }
     }   
 }

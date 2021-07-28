@@ -37,9 +37,13 @@ namespace Movies.Data.Services.Decorators
             throw new NotImplementedException();
         }
 
-        public Task<Result> DeleteMovieAsync(int producerId, int movieId)
+        public async Task<Result> DeleteMovieAsync(int producerId, int movieId)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var movieSerice = new MovieService(unitOfWork);
+                return await movieSerice.DeleteMovieAsync(producerId, movieId);
+            }
         }
 
         public async Task<Result<IEnumerable<Movie>>> GetAllMoviesAsync()
@@ -47,8 +51,7 @@ namespace Movies.Data.Services.Decorators
             using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
             {
                 var movieSerice = new MovieService(unitOfWork);
-                var task = movieSerice.GetAllMoviesAsync();
-                return await task;
+                return await movieSerice.GetAllMoviesAsync();
             }
         }
 

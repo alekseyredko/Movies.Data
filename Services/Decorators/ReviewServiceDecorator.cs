@@ -39,19 +39,31 @@ namespace Movies.Data.Services.Decorators
             }
         }
 
-        public Task<Result> DeleteReviewAsync(int reviewerId, int reviewId)
+        public async Task<Result> DeleteReviewAsync(int reviewerId, int reviewId)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var reviewService = new ReviewService(unitOfWork);
+                return await reviewService.DeleteReviewAsync(reviewerId, reviewId);
+            }
         }
 
-        public Task<Result> DeleteReviewerAsync(int id)
+        public async Task<Result> DeleteReviewerAsync(int id)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var reviewService = new ReviewService(unitOfWork);
+                return await reviewService.DeleteReviewerAsync(id);
+            }
         }
 
-        public Task<Result<IEnumerable<Reviewer>>> GetAllReviewersAsync()
+        public async Task<Result<IEnumerable<Reviewer>>> GetAllReviewersAsync()
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var reviewService = new ReviewService(unitOfWork);
+                return await reviewService.GetAllReviewersAsync();
+            }
         }
 
         public async Task<Result<IEnumerable<Review>>> GetAllReviewsAsync()
@@ -108,9 +120,13 @@ namespace Movies.Data.Services.Decorators
             }
         }
 
-        public Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer reviewer)
+        public async Task<Result<Reviewer>> UpdateReviewerAsync(Reviewer reviewer)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var reviewService = new ReviewService(unitOfWork);
+                return await reviewService.UpdateReviewerAsync(reviewer);
+            }
         }
     }
 }

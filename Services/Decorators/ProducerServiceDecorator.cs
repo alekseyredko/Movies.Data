@@ -30,14 +30,22 @@ namespace Movies.Data.Services.Decorators
             }
         }
 
-        public Task<Result> DeleteProducerAsync(int id)
+        public async Task<Result> DeleteProducerAsync(int id)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var service = new ProducerService(unitOfWork);
+                return await service.DeleteProducerAsync(id);
+            }
         }
 
-        public Task<Result<IEnumerable<Producer>>> GetAllProducersAsync()
+        public async Task<Result<IEnumerable<Producer>>> GetAllProducersAsync()
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var service = new ProducerService(unitOfWork);
+                return await service.GetAllProducersAsync();
+            }
         }
 
         public async Task<Result<Producer>> GetProducerAsync(int id)
@@ -49,9 +57,13 @@ namespace Movies.Data.Services.Decorators
             }
         }
 
-        public Task<Result<Producer>> UpdateProducerAsync(Producer Producer)
+        public async Task<Result<Producer>> UpdateProducerAsync(Producer Producer)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = new UnitOfWork(dbContextFactory.CreateDbContext()))
+            {
+                var service = new ProducerService(unitOfWork);
+                return await service.UpdateProducerAsync(Producer);
+            }
         }
     }
 }
