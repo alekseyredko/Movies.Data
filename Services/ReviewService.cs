@@ -327,6 +327,9 @@ namespace Movies.Data.Services
 
             review.ReviewerId = reviewerId;
             review.MovieId = movieId;
+
+            await _unitOfWork.Reviews.GetMovieReviewsAsync(getMovie.MovieId);
+
             getMovie.Reviews.Add(review);
 
             RecalculateTotalMovieScore(getMovie);
@@ -413,12 +416,15 @@ namespace Movies.Data.Services
                 return result;
             }
 
+            await _unitOfWork.Reviews.GetMovieReviewsAsync(getMovie.MovieId);
+
             if (canChangeRate)
             {
                 RecalculateTotalMovieScore(getMovie);
             }
 
-            _unitOfWork.Reviews.Update(getReview);
+            //_unitOfWork.Reviews.Update(getReview);
+
             _unitOfWork.Movies.Update(getMovie);
             await _unitOfWork.SaveAsync();
 
@@ -465,8 +471,10 @@ namespace Movies.Data.Services
                 return result;
             }
 
+            await _unitOfWork.Reviews.GetMovieReviewsAsync(getMovie.MovieId);
             
             getMovie.Reviews.Remove(getReview);
+
             RecalculateTotalMovieScore(getMovie);
 
             await _unitOfWork.Reviews.DeleteAsync(reviewId);
