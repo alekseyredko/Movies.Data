@@ -20,6 +20,8 @@ namespace Movies.Data.Models
 
         public virtual Person Person { get; set; }
 
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
+
         public User()
         {
             Roles = new HashSet<UserRoles> {UserRoles.Person};

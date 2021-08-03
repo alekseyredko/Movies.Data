@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
-namespace Movies.Data
+namespace Movies.Data.Models
 {
     public partial class RefreshToken
     {
