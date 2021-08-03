@@ -27,6 +27,7 @@ namespace Movies.Data.DataAccess
         private readonly IReviewerRepository _reviewerRepository;
         private readonly IReviewerWatchHistoryRepository _reviewerWatchHistoryRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IRefreshTokenRepository refreshTokens;
 
         public IActorRepository Actors => _actorRepository;
 
@@ -44,6 +45,10 @@ namespace Movies.Data.DataAccess
 
         public IReviewerWatchHistoryRepository ReviewersWatchHistory => _reviewerWatchHistoryRepository;
         public IUserRepository UserRepository => _userRepository;
+
+        public IRefreshTokenRepository RefreshTokens => refreshTokens;
+
+
 
         //public UnitOfWork(MoviesDBContext moviesDBContext)
         //{
@@ -68,7 +73,7 @@ namespace Movies.Data.DataAccess
             _reviewerWatchHistoryRepository = new ReviewerWatchHistoryRepository(_moviesDBContext);
             _userRepository = new UserRepository(_moviesDBContext);
             _producerRepository = new ProducerRepository(_moviesDBContext);
-
+            refreshTokens = new RefreshTokenRepository(_moviesDBContext);
         }
         
         public void Dispose()

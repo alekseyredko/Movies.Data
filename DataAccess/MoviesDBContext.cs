@@ -26,6 +26,7 @@ namespace Movies.Data.DataAccess
         public virtual DbSet<Reviewer> Reviewers { get; set; }
         public virtual DbSet<ReviewerWatchHistory> ReviewerWatchHistories { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
