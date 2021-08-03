@@ -129,6 +129,26 @@ namespace Movies.Data.DataAccess
                     );
 
 
+                modelBuilder.Entity<RefreshToken>(entity =>
+                {
+                    entity.ToTable("RefreshToken");
+
+                    entity.Property(e => e.RefreshTokenId).ValueGeneratedNever();
+
+                    entity.Property(e => e.Created).HasColumnType("datetime");
+
+                    entity.Property(e => e.Expires).HasColumnType("datetime");
+
+                    entity.Property(e => e.Token)
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    entity.HasOne(d => d.User)
+                        .WithMany(p => p.RefreshTokens)
+                        .HasForeignKey(d => d.UserId)
+                        .HasConstraintName("FK_RefreshToken_User");
+                });
+
                 entity.HasMany(d => d.Reviewers)
                     .WithMany(p => p.Movies)
                     .UsingEntity<ReviewerWatchHistory>
