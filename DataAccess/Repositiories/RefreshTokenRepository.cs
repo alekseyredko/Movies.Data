@@ -21,5 +21,11 @@ namespace Movies.Data.DataAccess.Repositiories
             var tokens = await context.RefreshTokens.Where(x => x.UserId == userId).ToListAsync();
             return tokens;
         }
+
+        public async Task SetAllUserTokensRevoked(int userId)
+        {
+            await context.RefreshTokens.Where(x => x.UserId == userId)
+                .ForEachAsync(x => x.IsRevoked = true);
+        }
     }
 }
