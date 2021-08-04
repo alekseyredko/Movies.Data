@@ -44,16 +44,10 @@ namespace Movies.Data.DataAccess
         public IReviewerRepository Reviewers => _reviewerRepository;
 
         public IReviewerWatchHistoryRepository ReviewersWatchHistory => _reviewerWatchHistoryRepository;
+
         public IUserRepository UserRepository => _userRepository;
 
         public IRefreshTokenRepository RefreshTokens => refreshTokens;
-
-
-
-        //public UnitOfWork(MoviesDBContext moviesDBContext)
-        //{
-        //    _moviesDBContext = moviesDBContext;
-        //}
 
         public UnitOfWork(IDbContextFactory<MoviesDBContext> dbContextFactory): this(dbContextFactory.CreateDbContext())
         {

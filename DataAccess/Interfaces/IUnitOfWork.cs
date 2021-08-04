@@ -19,6 +19,8 @@ namespace Movies.Data.DataAccess.Interfaces
         IReviewerRepository Reviewers { get; }
         IReviewerWatchHistoryRepository ReviewersWatchHistory { get; }
         IUserRepository UserRepository { get; }
+        IRefreshTokenRepository RefreshTokens { get; }
+
         Task<int> SaveAsync();
     }
 }

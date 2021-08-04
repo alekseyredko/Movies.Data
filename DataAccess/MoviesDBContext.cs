@@ -271,6 +271,7 @@ namespace Movies.Data.DataAccess
                 entity.Ignore(x => x.Password);
                 entity.Ignore(x => x.Name);
                 entity.Ignore(x => x.Token);
+                entity.Ignore(x => x.RefreshToken);
                 entity.Ignore(x => x.Roles);
             });
 

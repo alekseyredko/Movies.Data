@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace Movies.Data.DataAccess.Interfaces
 {
-    public interface IRefreshTokenRepository: IGenericRepository<RefreshToken>
+    public interface IRefreshTokenRepository : IGenericRepository<RefreshToken>
     {
+        Task<IEnumerable<RefreshToken>> GetRefreshTokensByUserId(int userId);
     }
 }
