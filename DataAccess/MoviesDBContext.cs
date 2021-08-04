@@ -132,9 +132,7 @@ namespace Movies.Data.DataAccess
 
                 modelBuilder.Entity<RefreshToken>(entity =>
                 {
-                    entity.ToTable("RefreshToken");
-
-                    entity.Property(e => e.RefreshTokenId).ValueGeneratedNever();
+                    entity.ToTable("RefreshToken");                    
 
                     entity.Property(e => e.Created).HasColumnType("datetime");
 
