@@ -63,7 +63,12 @@ namespace Movies.Data.Results
             return true;
         }
 
-        
+        public static void SetForbidden(string propName, Result result)
+        {
+            result.ResultType = ResultType.Forbidden;
+            result.Title = "Forbidden";
+            result.AddError(propName, $"Please login");
+        }
 
         public static void SetNotFound<T>(string propName, Result<T> result)
         {
